@@ -1,0 +1,111 @@
+// ==========================================
+// RichTextBanner.js - Gelişmiş Text Bileşeni ve Özellikleri Örneği
+// ==========================================
+
+import { useEffect, useMemo, useState } from 'react';
+import { Linking, SafeAreaView, Text, View } from 'react-native';
+
+// 1. ÖNE ÇIKANLAR LİSTESİ (HIGHLIGHTS)
+const HIGHLIGHTS = [
+  'Live coding',
+  'Q&A',
+  'Assignment review',
+  'Release announcements',
+];
+
+export default function RichTextBanner() {
+  
+  // 2. STATE (DURUM) TANIMLAMASI: Saniyede bir artan süre sayacı
+  const [seconds, setSeconds] = useState(0);
+
+  // 3. USEEFFECT HOOK (Zamanlayıcı - Timer)
+  useEffect(() => {
+    // Her 1 saniyede bir (1000ms) saniye sayacını 1 artırır
+    const interval = setInterval(() => setSeconds((prev) => prev + 1), 1000);
+    
+    // CLEANUP FONKSİYONU: Bileşen kapandığında hafıza sızıntısını önlemek için timer'ı temizler
+    return () => clearInterval(interval);
+  }, []);
+
+  // 4. USEMEMO İLE DİZİYİ METNE ÇEVİRME (.join)
+  // HIGHLIGHTS dizisindeki elemanları aralarına ' · ' koyarak tek bir string metne dönüştürür.
+  // useMemo sayesinde her render'da gereksiz yere yeniden hesaplanmaz.
+  const highlights = useMemo(() => HIGHLIGHTS.join(' · '), []);
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          padding: 24,
+          gap: 16,
+        }}
+      >
+        {/* 5. SELECTABLE TEXT (Seçilebilir Metin) */}
+        <Text
+          style={{
+            fontSize: 30,
+            fontWeight: '800',
+            color: '#f8fafc',
+          }}
+          selectable // ÖNEMLİ: Kullanıcının metnin üzerine basılı tutarak kopyalayabilmesini (select) sağlar!
+        >
+          Live React Native Session
+        </Text>
+        
+        {/* Canlı Sayaç Metni */}
+        <Text
+          style={{
+            color: '#22d3ee',
+            fontWeight: '600',
+            textTransform: 'uppercase', // Harflerin hepsini büyük yapar
+            letterSpacing: 2,           // Harfler arası boşluk
+          }}
+        >
+          Elapsed time: {seconds}s
+        </Text>
+        
+        {/* 6. SATIR SINIRLAMASI VE KESME (numberOfLines & ellipsizeMode) */}
+        <Text
+          style={{
+            color: '#94a3b8',
+            lineHeight: 22,
+          }}
+          numberOfLines={2}            // ÖNEMLİ: Metin en fazla 2 satır uzunluğunda gösterilir, uzarsa kesilir!
+          ellipsizeMode="tail"         // ÖNEMLİ: Metin sığmadığında sonuna üç nokta (...) ekleyerek keser ('tail' = sonu)
+        >
+          Every week we build real projects live, answer community questions,
+          and explore the latest in React Native together.
+        </Text>
+        
+        {/* 7. İÇ İÇE TEXT (Nested Text) KULLANIMI */}
+        <Text
+          style={{
+            color: '#facc15',
+            fontSize: 16,
+            fontWeight: '600',
+          }}
+        >
+          Highlights: {/* İçteki Text dıştakinin stilini miras alır ama kendi stilleriyle ezebilir! */}
+          <Text style={{ fontWeight: '400' }}>{highlights}</Text>
+        </Text>
+        
+        {/* 8. BAĞLANTI AÇMA (Linking.openURL) */}
+        <Text
+          style={{
+            color: '#38bdf8',
+            textDecorationLine: 'underline', // Altı çizili link görünümü
+            fontSize: 16,
+          }}
+          // Kullanıcı bu yazıya tıkladığında telefonun tarayıcısında verilen URL'yi açar
+          onPress={() => Linking.openURL('https://reactnative.dev/docs/text')}
+        >
+          Explore every Text prop in the docs
+        </Text>
+        
+      </View>
+    </SafeAreaView>
+  );
+}
