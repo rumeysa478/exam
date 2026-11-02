@@ -1,0 +1,42 @@
+// ==========================================
+// Timer.js - Zamanlayıcı ve useEffect Temizliği Örneği
+// ==========================================
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+export default function Timer() {
+  
+  // 1. STATE (DURUM) TANIMLAMALARI
+  const [seconds, setSeconds] = useState(0);       // Geçen saniye miktarını tutar
+  const [isRunning, setIsRunning] = useState(false); // Kronometrenin çalışıp çalışmadığını (true/false) takip eder
+
+  // 2. USEEFFECT HOOK KULLANIMI (Zamanlayıcı Mantığı)
+  useEffect(() => {
+    let interval; // Zamanlayıcı referansını tutacak değişken
+    
+    // Eğer isRunning true ise (Kronometre çalışıyorsa) saniyeyi her 1 saniyede bir artır
+    if (isRunning) {
+      interval = setInterval(() => {
+        // Güvenli güncelleme: Önceki saniye değerini baz alarak 1 artırıyoruz
+        setSeconds(seconds => seconds + 1);
+      }, 1000); // 1000 milisaniye = 1 saniye
+    }
+
+    // CLEANUP (TEMİZLİK) FONKSİYONU:
+    // Bileşen ekrandan kaldırıldığında veya 'isRunning' durumu değiştiğinde 
+    // arka planda çalışan eski interval'i temizler (Memory leak / hafıza sızıntısını önler).
+    return () => clearInterval(interval); 
+    
+  }, [isRunning]); // BAĞIMLILIK DİZİSİ: Bu useEffect SADECE 'isRunning' değeri değiştiğinde yeniden çalışır.
+
+  // 3. KONTROL FONKSİYONLARI
+  const startTimer = () => setIsRunning(true);  // Çalışma durumunu true yapar, timer başlar
+  const stopTimer = () => setIsRunning(false);   // Çalışma durumunu false yapar, timer durur
+  
+  const resetTimer = () => {
+    setSeconds(0);       // Saniyeyi sıfırla
+    setIsRunning(false); // Çalışmayı durdur
+  };
+
+  // 4. A
