@@ -1,0 +1,97 @@
+// ==========================================
+// CountdownController.js - Geri Sayım Sayacı Örneği
+// ==========================================
+
+import { useEffect, useState } from 'react';
+import { Button, SafeAreaView, Text, View } from 'react-native';
+
+export default function CountdownController() {
+  
+  // 1. STATE (DURUM) TANIMLAMALARI
+  const [timeLeft, setTimeLeft] = useState(10);     // Kalan süreyi saniye cinsinden tutar (Başlangıç: 10)
+  const [isRunning, setRunning] = useState(false);  // Sayacın çalışıp çalışmadığını (true/false) takip eder
+
+  // 2. USEEFFECT HOOK KULLANIMI (Geri Sayım Mantığı)
+  useEffect(() => {
+    // Eğer sayaç çalışmıyorsa (isRunning false ise) hiçbir şey yapma, çık
+    if (!isRunning) return;
+
+    // Her 1 saniyede bir (1000ms) çalışacak zamanlayıcıyı başlatıyoruz
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        // Eğer süre 1 saniye veya daha az kaldıysa
+        if (prev <= 1) {
+          setRunning(false); // Sayacı durdur
+          return 0;          // Süreyi 0'da sabitle
+        }
+        return prev - 1;     // Her saniye süreyi 1 azalt
+      });
+    }, 1000);
+
+    // CLEANUP (TEMİZLİK) FONKSİYONU:
+    // Bileşen kapandığında veya 'isRunning' durumu değiştiğinde arka plandaki timer'ı temizler (Hafıza sızıntısını önler)
+    return () => clearInterval(timer);
+    
+  }, [isRunning]); // BAĞIMLILIK DİZİSİ: Bu useEffect SADECE 'isRunning' değiştiğinde tetiklenir.
+
+  return (
+    // SafeAreaView: İçeriğin güvenli alanda kalmasını sağlar (#111827 koyu gri/siyah arka plan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#111827' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          padding: 24,
+          gap: 16,
+        }}
+      >
+        {/* Kart Konteyneri */}
+        <View
+          style={{
+            borderRadius: 20,
+            backgroundColor: '#1f2937',
+            padding: 24,
+            gap: 16,
+          }}
+        >
+          {/* Başlık Metni */}
+          <Text style={{ fontSize: 18, fontWeight: '600', color: '#f1f5f9' }}>
+            Time Remaining
+          </Text>
+          
+          {/* Kalan Süre Göstergesi */}
+          <Text
+            style={{
+              fontSize: 48,
+              fontWeight: '700',
+              // KOŞULLU RENK: Sayaç çalışıyorsa açık mavi (#38bdf8), duruyorsa turuncu (#f97316) renk olur
+              color: isRunning ? '#38bdf8' : '#f97316',
+              textAlign: 'center',
+            }}
+          >
+            {timeLeft}s
+          </Text>
+          
+          {/* Başlat / Duraklat (Start/Pause) Butonu */}
+          <Button
+            title={isRunning ? 'Pause' : 'Start'}
+            onPress={() => setRunning((prev) => !prev)} // Tıklandığında isRunning durumunu tersine çevirir (true <-> false)
+            color={isRunning ? '#f97316' : '#2563eb'}
+          />
+          
+          {/* Sıfırla (Reset) Butonu */}
+          <Button
+            title="Reset"
+            onPress={() => {
+              setTimeLeft(10);     // Süreyi tekrar 10'a eşitle
+              setRunning(false); // Sayacı durdur
+            }}
+            color="#0ea5e9"
+            disabled={timeLeft === 10 && !isRunning} // Eğer süre zaten 10'da ve çalışmıyorsa buton pasif olur
+          />
+          
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
