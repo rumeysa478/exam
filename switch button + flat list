@@ -1,0 +1,97 @@
+// ==========================================
+// CourseModules.js - FlatList ve Switch ile Modül Takip Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { FlatList, SafeAreaView, Switch, Text, View } from 'react-native';
+
+// Sabit kurs modülleri listesi (Her modülün id, title ve duration bilgisi vardır)
+const MODULES = [
+  { id: '1', title: 'Introduction & Setup', duration: 12 },
+  { id: '2', title: 'Core Components', duration: 18 },
+  { id: '3', title: 'State & Props', duration: 22 },
+  { id: '4', title: 'Navigation', duration: 15 },
+];
+
+export default function CourseModules() {
+  
+  // 1. STATE (DURUM) TANIMLAMASI
+  // completed: Hangi modülün tamamlandığını bir nesne olarak tutar (Örn: { '1': true, '2': false })
+  const [completed, setCompleted] = useState({});
+
+  // 2. MODÜL DURUMUNU DEĞİŞTİRME FONKSİYONU
+  const toggleModule = (id, value) => {
+    // Önceki state kopyalanır ve ilgili modülün yeni true/false değeri kaydedilir
+    setCompleted((prev) => ({ ...prev, [id]: value }));
+  };
+
+  return (
+    // SafeAreaView: İçeriğin telefonun çentik ve kenar boşluklarında kalmasını engeller
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+      <View style={{ padding: 24, gap: 16, flex: 1 }}>
+        
+        {/* Başlık */}
+        <Text style={{ fontSize: 22, fontWeight: '700', color: '#0f172a' }}>
+          Course Modules
+        </Text>
+        
+        {/* 3. FLATLIST (Performanslı Liste Bileşeni) */}
+        <FlatList
+          data={MODULES}                            // Listelenecek veri dizisi
+          keyExtractor={(item) => item.id}          // Her öğe için benzersiz anahtar belirleyici
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />} // Öğeler arası boşluk bırakır
+          contentContainerStyle={{ paddingBottom: 24 }} // Listenin en altındaki boşluk
+          
+          // renderItem: Dizideki her bir elemanı ekranda nasıl çizeceğimizi belirler
+          renderItem={({ item }) => {
+            const done = completed[item.id]; // O anki modül tamamlandı mı? (true/false)
+            return (
+              <View
+                style={{
+                  padding: 18,
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  // KOŞULLU STİL: Tamamlandıysa yeşil çerçeve ve açık yeşil arkaplan, değilse normal gri/beyaz
+                  borderColor: done ? '#22c55e' : '#e2e8f0',
+                  backgroundColor: done ? '#dcfce7' : '#fff',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                {/* Modül Başlığı ve Süresi */}
+                <View style={{ gap: 4 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '600' }}>
+                    {item.title}
+                  </Text>
+                  <Text style={{ color: '#475569' }}>
+                    Duration: {item.duration} min
+                  </Text>
+                </View>
+                
+                {/* Switch (Açma / Kapama Düğmesi) */}
+                <Switch
+                  value={done} // Düğmenin o anki açık/kapalı durumu
+                  onValueChange={(value) => toggleModule(item.id, value)} // Değiştiğinde state'i güncelle
+                />
+              </View>
+            );
+          }}
+          
+          // ListFooterComponent: Listenin en altında sabit olarak görünecek alan (İlerleme Sayacı)
+          ListFooterComponent={() => {
+            const total = MODULES.length; // Toplam modül sayısı (4)
+            // completed içindeki değerlerden sadece 'true' olanları sayar
+            const doneCount = Object.values(completed).filter(Boolean).length;
+            return (
+              <Text style={{ marginTop: 16, textAlign: 'center', color: '#1f2937' }}>
+                Completed: {doneCount} / {total}
+              </Text>
+            );
+          }}
+        />
+        
+      </View>
+    </SafeAreaView>
+  );
+}
