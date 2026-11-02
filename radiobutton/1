@@ -1,0 +1,88 @@
+// ==========================================
+// ModuleSelector.js - Özel Radyo Butonu (Radio Group) Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { SafeAreaView, View, Text, Pressable } from 'react-native';
+
+// 1. SEÇENEKLER LİSTESİ (MODULES)
+// Kullanıcının seçebileceği modül seçeneklerini içeren sabit dizi.
+const MODULES = [
+  { id: 'core', title: 'Core Components' },
+  { id: 'state', title: 'State & Props' },
+  { id: 'nav', title: 'Navigation' },
+];
+
+// 2. ALT BİLEŞEN (RadioItem): Tek bir radyo buton satırını temsil eder
+function RadioItem({ label, value, isSelected, onPress }) {
+  return (
+    <Pressable
+      accessibilityRole="radio"             // Erişilebilirlik için ekran okuyuculara bunun bir radyo buton olduğunu söyler
+      accessibilityState={{ selected: isSelected }} // Seçili olup olmadığını erişilebilirlik motoruna bildirir
+      onPress={() => onPress(value)}        // Tıklandığında üst bileşenden gelen fonksiyonu tetikler ve kendi değerini gönderir
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 }}
+    >
+      {/* DIŞ ÇEMBER (Radyo Kutusu) */}
+      <View
+        style={{
+          width: 22,
+          height: 22,
+          borderRadius: 11,               // Yarıçap genişliğin/yüksekliğin yarısı kadar olursa daire (circle) olur
+          borderWidth: 2,
+          // KOŞULLU STİL: Eğer seçildiyse açık mavi (#38bdf8), değilse sönük gri (#475569) çerçeve
+          borderColor: isSelected ? '#38bdf8' : '#475569',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {/* İÇ DAİRE (Sadece 'isSelected' true ise görünür) */}
+        {isSelected && (
+          <View
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: 5,            // İçteki küçük daireyi yuvarlar
+              backgroundColor: '#38bdf8', // Seçildiğinde içi mavi dolan nokta
+            }}
+          />
+        )}
+      </View>
+      
+      {/* Radyo Butonunun Yanındaki Metin Etiketi */}
+      <Text style={{ color: '#e2e8f0', fontSize: 16 }}>{label}</Text>
+    </Pressable>
+  );
+}
+
+// 3. ANA BİLEŞEN (ModuleSelector)
+export default function ModuleSelector() {
+  
+  // STATE TANIMLAMASI: O an seçili olan modülün ID'sini tutar (Başlangıç: 'core')
+  const [value, setValue] = useState('core');
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a', padding: 24 }}>
+      
+      {/* Sabit Bilgilendirme Başlığı */}
+      <Text style={{ color: '#94a3b8' }}>Active Module</Text>
+      
+      {/* DİNAMİK BAŞLIK: MODULES dizisinde seçilen id'ye ait title'ı bulup ekrana büyük yazar */}
+      <Text style={{ color: '#e2e8f0', fontSize: 22, fontWeight: '700', marginBottom: 16 }}>
+        {MODULES.find((item) => item.id === value)?.title}
+      </Text>
+      
+      {/* 4. DİZİYİ DÖNME (MAP): Her bir modül için RadioItem bileşenini ekrana basıyoruz */}
+      {MODULES.map((item) => (
+        <RadioItem
+          key={item.id}                     // Benzersiz anahtar
+          label={item.title}                // Görünen metin
+          value={item.id}                   // Bu butonun temsil ettiği değer
+          isSelected={value === item.id}    // O an seçili olan değer bu item ile aynı mı? (true/false)
+          onPress={setValue}                // Tıklandığında doğrudan setValue çalışır ve state güncellenir
+        />
+      ))}
+      
+    </SafeAreaView>
+  );
+}
