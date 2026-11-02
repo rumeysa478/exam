@@ -1,0 +1,98 @@
+// ==========================================
+// ScheduleFilter.js - Picker ve useMemo ile Veri Filtreleme Örneği
+// ==========================================
+
+import { useMemo, useState } from 'react';
+import { SafeAreaView, View, Text, FlatList } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+
+// 1. HAM VERİ LİSTESİ (SESSIONS)
+// Her oturumun (session) bir id'si, başlığı (title) ve hangi kategoriye/trene ait olduğu (track) bilgisi vardır.
+const SESSIONS = [
+  { id: '1', title: 'Intro to View', track: 'foundation' },
+  { id: '2', title: 'Layout Playground', track: 'foundation' },
+  { id: '3', title: 'State Drill', track: 'growth' },
+  { id: '4', title: 'FlatList Patterns', track: 'growth' },
+  { id: '5', title: 'Perf Budgeting', track: 'advanced' },
+];
+
+export default function ScheduleFilter() {
+  
+  // 2. STATE (DURUM) TANIMLAMASI
+  // track: Kullanıcının o an seçtiği filtre türünü tutar (Varsayılan: 'foundation')
+  const [track, setTrack] = useState('foundation');
+
+  // 3. USEMEMO İLE PERFORMANSLI FİLTRELEME (Çok Önemli Sınav Konusu!)
+  // SESSIONS dizisini, seçilen 'track' değerine göre filtreler.
+  // useMemo sayesinde her ekrana yeniden çizilmede (render) dizi gereksiz yere baştan taranmaz;
+  // SADECE 'track' değeri değiştiğinde filtreleme işlemi yeniden çalışır (Memory Cache / Önbellek).
+  const filtered = useMemo(
+    () => SESSIONS.filter((session) => session.track === track),
+    [track] // Bağımlılık dizisi: Sadece track değiştiğinde tetiklenir
+  );
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#020617 koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#020617', padding: 24 }}>
+      
+      {/* 4. PICKER (FİLTRELEME SEÇİM MENÜSÜ) Kapsayıcısı */}
+      <View
+        style={{
+          backgroundColor: '#1e293b',
+          borderRadius: 14,
+          paddingHorizontal: 12,
+        }}
+      >
+        <Picker
+          selectedValue={track}                    // O an seçili olan kategori (state'den beslenir)
+          onValueChange={(value) => setTrack(value)} // Kullanıcı listeden başka bir şey seçtiğinde 'track' state'ini günceller
+          mode="dropdown"                          // Açılır menü stil modu
+          dropdownIconColor="#f97316"              // Açılır ok simgesinin rengi (Turuncu)
+        >
+          {/* Picker Seçenekleri */}
+          <Picker.Item label="Foundation Track" value="foundation" />
+          <Picker.Item label="Growth Track" value="growth" />
+          <Picker.Item label="Advanced Track" value="advanced" />
+        </Picker>
+      </View>
+
+      {/* 5. FİLTRELENEN VERİLERİ LİSTELEME (FLATLIST) */}
+      <FlatList
+        data={filtered}                           // Ham veri yerine FİLTRELENMİŞ dizi (filtered) verilir
+        keyExtractor={(item) => item.id}          // Her öğe için benzersiz kimlik
+        contentContainerStyle={{ gap: 12, marginTop: 24 }} // Öğeler arası boşluk ve üstten mesafe
+        
+        // renderItem: Filtrelenen her bir oturumu ekranda kart şeklinde çizer
+        renderItem={({ item }) => (
+          <View
+            style={{
+              backgroundColor: '#0f172a',
+              padding: 18,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: '#1f2937',
+            }}
+          >
+            {/* Oturum Başlığı */}
+            <Text style={{ color: '#e2e8f0', fontSize: 16, fontWeight: '600' }}>
+              {item.title}
+            </Text>
+            
+            {/* Ternary Operatör ile Dinamik Seviye Metni Yazdırma */}
+            <Text style={{ color: '#94a3b8', marginTop: 4 }}>
+              {track === 'foundation' ? 'Temel' : track === 'growth' ? 'Orta' : 'İleri'} seviye
+            </Text>
+          </View>
+        )}
+        
+        // 6. LİSTE BOŞ OLDUĞUNDA GÖSTERİLECEK BİLEŞEN (ListEmptyComponent - Sınav Sorusu!)
+        // Eğer filtrelenen sonuçta hiç öğe kalmazsa ekranda bu metin görünür.
+        ListEmptyComponent={
+          <Text style={{ color: '#94a3b8', textAlign: 'center', marginTop: 32 }}>
+            Bu track için oturum planlanmadı.
+          </Text>
+        }
+      />
+    </SafeAreaView>
+  );
+}
