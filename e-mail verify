@@ -1,0 +1,87 @@
+// ==========================================
+// EmailField.js - RegEx ile E-posta Doğrulama Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { SafeAreaView, Text, TextInput, View } from 'react-native';
+
+// 1. REGEX (DÜZENLİ İFADE) TANIMI
+// E-posta formatının doğru olup olmadığını (örnek: metin@metin.uzanti) kontrol eden standart kural kalıbı.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export default function EmailField() {
+  
+  // 2. STATE (DURUM) TANIMLAMASI
+  const [value, setValue] = useState(''); // Kullanıcının girdiği e-posta metnini tutar
+  
+  // 3. DOĞRULAMA KONTROLÜ (Test)
+  // EMAIL_REGEX.test(value) -> Girilen metin kurala uyuyorsa true, uymuyorsa false döner.
+  const isValid = EMAIL_REGEX.test(value);
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          padding: 24,
+        }}
+      >
+        {/* Kart Konteyneri (Koyu gri arkaplan ve iç boşluklar) */}
+        <View
+          style={{
+            borderRadius: 16,
+            backgroundColor: '#1f2937',
+            padding: 24,
+            gap: 16,
+          }}
+        >
+          {/* Başlık */}
+          <Text style={{ fontSize: 20, fontWeight: '600', color: '#f1f5f9' }}>
+            Verify your email address
+          </Text>
+          
+          {/* 4. TEXTINPUT (E-posta Giriş Alanı ve Kritik Özellikleri) */}
+          <TextInput
+            value={value}
+            onChangeText={setValue}                  // Yazıldıkça state'i günceller
+            
+            // KİRİTİK SINAV ÖZELLİKLERİ:
+            keyboardType="email-address"             // ÖNEMLİ: Klavyede '@' ve '.' işaretlerinin doğrudan çıkmasını sağlayan e-posta klavyesini açar!
+            autoCapitalize="none"                    // ÖNEMLİ: E-postaların başında otomatik büyük harf başlamasını engeller!
+            
+            placeholder="name@example.com"
+            placeholderTextColor="#94a3b8"
+            
+            // 5. DİNAMİK KENARLIK RENGİ (BorderColor Ternary Zinciri)
+            style={{
+              borderWidth: 1,
+              borderColor:
+                value.length === 0
+                  ? '#334155'                        // Durum 1: Alan boşsa sönük gri çerçeve
+                  : isValid
+                  ? '#22c55e'                        // Durum 2: E-posta geçerliyse yeşil çerçeve (#22c55e)
+                  : '#ef4444',                       // Durum 3: E-posta hatalıysa kırmızı çerçeve (#ef4444)
+              borderRadius: 10,
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+              color: '#f8fafc',
+            }}
+          />
+          
+          {/* 6. DİNAMİK DURUM MESAJI VE RENK YÖNETİMİ */}
+          <Text style={{ color: isValid ? '#22c55e' : '#f97316' }}>
+            {value.length === 0
+              ? 'Start typing your email address.'    // Henüz bir şey yazılmadıysa bilgilendirme
+              : isValid
+              ? 'Looks like a valid address.'         // E-posta doğruysa yeşil başarı mesajı
+              : 'Please enter a valid email address.' // E-posta yanlışsa turuncu/kırmızı uyarı mesajı}
+            }
+          </Text>
+          
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
