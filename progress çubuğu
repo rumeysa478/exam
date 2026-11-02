@@ -1,0 +1,64 @@
+// ==========================================
+// DashboardCard.js - İlerleme Çubuğu (Progress Bar) Kartı Örneği
+// ==========================================
+
+import { SafeAreaView, View, Text } from 'react-native';
+
+export default function DashboardCard() {
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#020617 koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#020617' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center', // İçeriği dikeyde ortalar
+          padding: 24,
+        }}
+      >
+        {/* ANA KART KONTEYNERİ (Koyu lacivert arkaplan ve yuvarlatılmış köşeler) */}
+        <View
+          style={{
+            padding: 24,
+            borderRadius: 20,
+            backgroundColor: '#0f172a',
+            gap: 20, // İçindeki tüm bileşenler arasına dikeyde 20 birim boşluk bırakır
+          }}
+        >
+          {/* 1. ÜST BİLGİ SATIRI (Başlık ve Yüzde Artış Göstergesi) */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={{ color: '#e2e8f0', fontSize: 18, fontWeight: '600' }}>
+              Daily Lesson Progress
+            </Text>
+            <Text style={{ color: '#38bdf8', fontWeight: '600' }}>+12%</Text>
+          </View>
+          
+          {/* 2. İLERLEME ÇUĞUĞU ARKA PLANI (Boş Çubuk) */}
+          <View
+            style={{
+              height: 8,                         // Çubuğun dikey kalınlığı
+              borderRadius: 8,
+              backgroundColor: '#1e293b',        // Henüz dolmamış kısmın koyu gri/lacivert rengi
+            }}
+          >
+            {/* 3. İLERLEME ÇUĞUĞU DOLGU KISMI (Dolgulu Alan - Çok Önemli Sınav Konusu!) */}
+            <View
+              style={{
+                width: '65%',                    // ÖNEMLİ: Çubuğun yüzde kaç dolu olduğunu gösterir (Örn: %65 tamamlandı)
+                height: '100%',
+                borderRadius: 8,
+                backgroundColor: '#38bdf8',      // Dolan kısmın parlak mavi rengi
+              }}
+            />
+          </View>
+          
+          {/* 4. ALT BİLGİ SATIRI (Tamamlanan Ders Sayısı / Toplam) */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={{ color: '#94a3b8' }}>Lessons completed</Text>
+            <Text style={{ color: '#e2e8f0', fontWeight: '600' }}>13 / 20</Text>
+          </View>
+          
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
