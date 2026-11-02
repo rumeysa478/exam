@@ -1,0 +1,63 @@
+// ==========================================
+// LessonChecklist.js - Checkbox ile Görev Listesi Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { SafeAreaView, View, Text } from 'react-native';
+import Checkbox from 'expo-checkbox'; // Expo'nun onay kutusu bileşeni
+
+// Sabit görev listesi (Her görevin benzersiz bir 'id'si ve görünen 'label' metni vardır)
+const TASKS = [
+  { id: 'slides', label: 'Review the new slides' },
+  { id: 'demo', label: 'Run the Image + ScrollView demo' },
+  { id: 'prep', label: 'Draft the Q&A scenarios' },
+];
+
+export default function LessonChecklist() {
+  
+  // 1. STATE (DURUM) TANIMLAMASI
+  // completed: Hangi görevin işaretli olduğunu bir JavaScript objesi olarak tutar (Örn: { slides: true, demo: false })
+  const [completed, setCompleted] = useState({});
+
+  // 2. GÖREV DURUMUNU GÜNCELLEME FONKSİYONU
+  const toggleTask = (taskId, value) => {
+    // Önceki state'in kopyasını alıp (...prev), ilgili task'ın yeni değerini (true/false) objeye işliyoruz
+    setCompleted((prev) => ({ ...prev, [taskId]: value }));
+  };
+
+  return (
+    // SafeAreaView: İçeriğin telefonun çentik ve kenar boşluklarında kalmasını engeller, güvenli alanda tutar
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a', padding: 24, gap: 16 }}>
+      
+      {/* Başlık Metni */}
+      <Text style={{ color: '#e2e8f0', fontSize: 22, fontWeight: '700' }}>W6 Prep</Text>
+      
+      {/* 3. DİZİYİ DÖNME (MAP): TASKS dizisindeki her bir eleman için ekrana bir satır oluşturuyoruz */}
+      {TASKS.map((task) => (
+        <View
+          key={task.id} // React'in listelenen elemanları benzersiz şekilde ayırt edebilmesi için anahtar
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 }}
+        >
+          {/* Checkbox (Onay Kutusu) Bileşeni */}
+          <Checkbox
+            value={!!completed[task.id]} // !! ile değer kesinlikle boolean (true/false) formata dönüştürülür
+            onValueChange={(value) => toggleTask(task.id, value)} // Kutuya tıklandığında tetiklenir ve yeni değeri kaydeder
+            color={completed[task.id] ? '#22c55e' : undefined} // Eğer işaretliyse yeşil renk (#22c55e) alır
+            style={{ width: 22, height: 22, borderRadius: 6 }} // Kutunun boyut ve köşe yuvarlama stilleri
+          />
+          
+          {/* Görev Etiketi (Label) */}
+          <Text
+            style={{
+              color: '#e2e8f0',
+              // KOŞULLU STİL: Eğer görev tamamlandıysa (true) yazının üzerini çiz ('line-through'), yoksa normal bırak ('none')
+              textDecorationLine: completed[task.id] ? 'line-through' : 'none',
+            }}
+          >
+            {task.label}
+          </Text>
+        </View>
+      ))}
+    </SafeAreaView>
+  );
+}
