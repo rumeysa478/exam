@@ -1,0 +1,84 @@
+// ==========================================
+// MessageExample.js - Props Kullanım Örneği
+// ==========================================
+
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+// ==========================================
+// PROPS NEDİR?: Üst bileşenden gelen verileri (title, message, color)
+// süslü parantez {} içinde parametre olarak yakalıyoruz.
+// ==========================================
+function Message({ title, message, color }) {
+  return (
+    // Ana kutu konteyneri
+    <View style={styles.container}>
+      
+      {/* title props'unu yazar ve stil nesnesi içinde gelen [color] değerini dinamik uygular */}
+      <Text style={[styles.title, { color }]}>{title}</Text>
+      
+      {/* message props'unu ekrana metin olarak yazar */}
+      <Text style={styles.message}>{message}</Text>
+      
+    </View>
+  );
+}
+
+// ==========================================
+// ANA BİLEŞEN (Parent Component): 
+// Props'ları oluşturan ve alt bileşene (`Message`) gönderen kısımdır.
+// ==========================================
+export default function App() {
+  return (
+    <View style={styles.app}>
+      
+      {/* 1. Kullanım: Message bileşenine title, message ve color verilerini props olarak yolluyoruz */}
+      <Message 
+        title="Welcome" 
+        message="You are learning React Native!" 
+        color="#007AFF"
+      />
+      
+      {/* 2. Kullanım: Aynı şablonu tekrar yazmadan, farklı props'larla yeniden kullanıyoruz (Reusability) */}
+      <Message 
+        title="Success" 
+        message="You learned props usage!" 
+        color="#28A745"
+      />
+      
+      {/* 3. Kullanım: Uyarı başlığı, mesajı ve sarı rengi props olarak iletiyoruz */}
+      <Message 
+        title="Warning" 
+        message="Props are read-only!" 
+        color="#FFC107"
+      />
+      
+    </View>
+  );
+}
+
+// ==========================================
+// TASARIM VE STİL TANIMLAMALARI (StyleSheet)
+// ==========================================
+const styles = StyleSheet.create({
+  app: {
+    flex: 1,                    // Ekranın tamamını kapla
+    padding: 20,                // Kenarlardan boşluk bırak
+    justifyContent: 'center',   // İçeriği dikeyde ortala
+  },
+  container: {
+    backgroundColor: '#f8f9fa', // Kartların arka plan rengi
+    padding: 20,                // İç boşluk
+    borderRadius: 10,           // Köşeleri yuvarla
+    marginBottom: 15,           // Kartlar arası alt boşluk
+  },
+  title: {
+    fontSize: 18,               // Başlık yazı boyutu
+    fontWeight: 'bold',         // Kalın yazı tipi
+    marginBottom: 8,            // Başlık ile mesaj arası boşluk
+  },
+  message: {
+    fontSize: 14,               // Açıklama metni boyutu
+    color: '#666',              // Gri metin rengi
+  },
+});
