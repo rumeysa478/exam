@@ -1,0 +1,92 @@
+// ==========================================
+// TrackSelector.js - FlatList İçinde Radyo Buton ve Kart Seçimi Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { SafeAreaView, FlatList, View, Text, Pressable } from 'react-native';
+
+// 1. SEÇENEKLER LİSTESİ (TRACKS)
+// Kullanıcının seçebileceği eğitim parkurlarını içeren sabit dizi (id ve ekranda görünecek label)
+const TRACKS = [
+  { id: 'foundation', label: 'Foundation · Layout' },
+  { id: 'growth', label: 'Growth · Networking' },
+  { id: 'advanced', label: 'Advanced · Performance' },
+  { id: 'capstone', label: 'Capstone · Final Project' },
+];
+
+export default function TrackSelector() {
+  
+  // 2. STATE (DURUM) TANIMLAMASI
+  // selected: O an seçili olan track'in ID'sini tutar (Başlangıç değeri: 'foundation')
+  const [selected, setSelected] = useState('foundation');
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#020617 koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#020617', paddingTop: 24 }}>
+      
+      {/* 3. FLATLIST (Performanslı Liste Yapısı) */}
+      <FlatList
+        data={TRACKS}                             // Listelenecek veri dizisi
+        keyExtractor={(item) => item.id}          // Her öğe için benzersiz ID belirleyici
+        contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }} // Kenar boşlukları ve öğeler arası 12 birim mesafe
+        
+        // renderItem: Dizideki her bir track elemanını kart şeklinde ekranda çizer
+        renderItem={({ item }) => {
+          // Bu öğe şu an seçili olan öğe mi? (true veya false döner)
+          const isActive = item.id === selected;
+          
+          return (
+            /* 4. PRESSABLE (Tıklanabilir Kart Bileşeni) */
+            <Pressable
+              accessibilityRole="radio"             // Ekran okuyucular için radyo buton rolü
+              accessibilityState={{ selected: isActive }} // Seçili durumunu erişilebilirlik motoruna bildirir
+              onPress={() => setSelected(item.id)} // Kartın herhangi bir yerine tıklandığında state'i günceller
+              
+              // 5. KOŞULLU KART STİLLERİ (Dinamik Tasarım)
+              style={{
+                // Eğer seçiliyse koyu mavi arkaplan (#172554), değilse standart koyu gri (#0f172a)
+                backgroundColor: isActive ? '#172554' : '#0f172a',
+                borderRadius: 16,
+                padding: 16,
+                borderWidth: 1,
+                // Eğer seçiliyse parlayan açık mavi çerçeve (#38bdf8), değilse sönük çerçeve (#1e293b)
+                borderColor: isActive ? '#38bdf8' : '#1e293b',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+              }}
+            >
+              {/* 6. ÖZEL RADYO BUTON ÇEMBERİ */}
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,                 // Genişliğin/yüksekliğin yarısı kadar radius daire yapar
+                  borderWidth: 2,
+                  borderColor: isActive ? '#38bdf8' : '#475569',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {/* İÇ NOKTA: Sadece bu kart 'isActive' (seçili) ise görünür */}
+                {isActive && (
+                  <View
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 5,              // İç küçük daire
+                      backgroundColor: '#38bdf8',   // Açık mavi dolgu rengi
+                    }}
+                  />
+                )}
+              </View>
+              
+              {/* Kartın İçindeki Metin Etiketi */}
+              <Text style={{ color: '#e2e8f0', fontSize: 16 }}>{item.label}</Text>
+            </Pressable>
+          );
+        }}
+      />
+    </SafeAreaView>
+  );
+}
