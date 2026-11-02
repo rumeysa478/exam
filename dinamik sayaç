@@ -1,0 +1,182 @@
+// ==========================================================
+// App.js - Tek Dosyada Açıklamalı Dinamik Sayaç Örneği
+// ==========================================================
+
+// 1. Gerekli React ve React Native bileşenlerini içe aktarıyoruz
+import React, { useState } from 'react';
+import { 
+  SafeAreaView, 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Alert 
+} from 'react-native';
+
+export default function App() {
+  
+  // 2. STATE (DURUM) TANIMLAMALARI
+  // count: Sayacın anlık değerini tutar (başlangıç 0)
+  // setCount: Sayacın değerini güncellemek ve ekranı yenilemek için kullanılan fonksiyon
+  const [count, setCount] = useState(0);
+
+  // Sabit sınır değerleri
+  const maxLimit = 10;
+  const minLimit = 0;
+
+  // 3. SAYACI ARTIRMA FONKSİYONU
+  const handleIncrement = () => {
+    // Eğer sayaç maksimum sınırdan küçükse artır
+    if (count < maxLimit) {
+      setCount(count + 1);
+    } else {
+      // Sınıra ulaşıldığında kullanıcıyı uyarı kutusuyla bilgilendir
+      Alert.alert("Sınır Uyarısı", "Maksimum sınıra ulaştınız! (10)");
+    }
+  };
+
+  // 4. SAYACI AZALTMA FONKSİYONU
+  const handleDecrement = () => {
+    // Eğer sayaç minimum sınırdan büyükse azalt
+    if (count > minLimit) {
+      setCount(count - 1);
+    } else {
+      Alert.alert("Sınır Uyarısı", "Minimum sınıra ulaştınız! (0)");
+    }
+  };
+
+  // 5. DİNAMİK HESAPLAMALAR VE MESAJLAR
+  // İlerleme yüzdesini hesaplıyoruz (örneğin 5/10 -> %50)
+  const progressPercentage = (count / maxLimit) * 100;
+
+  // Sayacın değerine göre ekrandaki motivasyon mesajını değiştiriyoruz
+  let dynamicMessage = "Hadi saymaya başla! 🚀";
+  if (count === 5) dynamicMessage = "Yarı yola geldin! Harika gidiyorsun ⭐";
+  if (count === 10) dynamicMessage = "Tebrikler, zirveye ulaştın! 🎉";
+
+  // 6. ARAYÜZÜN OLUŞTURULDUĞU YER (JSX Return)
+  return (
+    // SafeAreaView: Telefonun çentikli ekran alanlarından kaçınarak güvenli alanda kalır
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.card}>
+        
+        {/* Başlık */}
+        <Text style={styles.cardTitle}>Dinamik Sayaç Uygulaması</Text>
+        
+        {/* Dinamik Değişkene Göre Değişen Mesaj */}
+        <Text style={styles.dynamicMessage}>{dynamicMessage}</Text>
+        
+        {/* Anlık Sayaç Değeri */}
+        <Text style={styles.counterText}>Sayaç: {count}</Text>
+        
+        {/* İlerleme Çubuğu (Progress Bar) Arka Planı */}
+        <View style={styles.progressBarContainer}>
+          {/* İlerleme Çubuğu Doluluk Oranı (Dinamik width %) */}
+          <View style={[styles.progressBarFill, { width: `${progressPercentage}%` }]} />
+        </View>
+        <Text style={styles.progressText}>İlerleme: %{progressPercentage}</Text>
+
+        {/* Butonların Bulunduğu Yatay Satır */}
+        <View style={styles.buttonRow}>
+          
+          {/* Azaltma Butonu (Eğer min sınırdaysa grileşir ve pasifleşir) */}
+          <TouchableOpacity 
+            style={[styles.btn, count === minLimit && styles.btnDisabled]} 
+            onPress={handleDecrement}
+          >
+            <Text style={styles.btnText}>Azalt (-)</Text>
+          </TouchableOpacity>
+
+          {/* Artırma Butonu (Eğer max sınırdaysa grileşir ve pasifleşir) */}
+          <TouchableOpacity 
+            style={[styles.btn, count === maxLimit && styles.btnDisabled]} 
+            onPress={handleIncrement}
+          >
+            <Text style={styles.btnText}>Artır (+)</Text>
+          </TouchableOpacity>
+
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+// ==========================================================
+// 7. TASARIM VE STİL TANIMLAMALARI (StyleSheet)
+// ==========================================================
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,                    // Ekranın tamamını kapla
+    backgroundColor: '#edf2f7', // Hafif gri arka plan
+    justifyContent: 'center',   // Dikeyde tam ortala
+    padding: 20,                // Kenarlardan boşluk
+  },
+  card: {
+    backgroundColor: '#ffffff', // Beyaz kart arka planı
+    borderRadius: 12,           // Köşeleri yuvarla
+    padding: 20,                // İç boşluk
+    shadowColor: '#000',        // Gölge efekti (iOS)
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,               // Gölge efekti (Android)
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2d3748',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  counterText: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#3182ce',
+    marginVertical: 10,
+  },
+  dynamicMessage: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    color: '#d69e2e',
+    marginBottom: 5,
+  },
+  progressBarContainer: {
+    height: 10,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 5,
+    overflow: 'hidden',         // Taşmaları engelle
+    marginVertical: 10,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#3182ce', // Mavi doluluk rengi
+  },
+  progressText: {
+    fontSize: 12,
+    textAlign: 'right',
+    color: '#718096',
+    marginBottom: 20,
+  },
+  buttonRow: {
+    flexDirection: 'row',       // Butonları yan yana diz
+    justifyContent: 'space-between',
+  },
+  btn: {
+    flex: 1,                    // Eşit boyutta alan kapla
+    backgroundColor: '#3182ce',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 5,        // Butonlar arası boşluk
+  },
+  btnDisabled: {
+    backgroundColor: '#cbd5e0', // Sınıra ulaşıldığındaki pasif gri renk
+  },
+  btnText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
