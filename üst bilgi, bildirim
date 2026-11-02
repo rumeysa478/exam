@@ -1,0 +1,96 @@
+// ==========================================
+// NotchedHeaderDemo.js - Güvenli Alan ve Insets Örneği
+// ==========================================
+
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+import { Image, Text, View } from 'react-native';
+
+// 1. İÇ BİLEŞEN (HeaderContent): SafeAreaInsets hook'unu kullanabilmek için Provider'ın içinde olmalıdır!
+function HeaderContent() {
+  
+  // useSafeAreaInsets() Hook'u: Cihazın çentik (notch), üst dinamik ada veya alt homebar boşluklarının piksel değerlerini (ölçülerini) verir.
+  const insets = useSafeAreaInsets();
+
+  return (
+    // Ana kapsayıcı: Tüm ekranı kaplar ve koyu lacivert arkaplan (#020617) verir
+    <View style={{ flex: 1, backgroundColor: '#020617' }}>
+      
+      {/* 2. SAFEAREAVIEW (Üst Güvenli Alan) */}
+      <SafeAreaView
+        edges={['top']} // Sadece üst kenarı (top) cihazın çentiğinden korur
+        style={{
+          backgroundColor: '#0f172a',
+          // Manuel padding takviyesi: Çentiğin altında içeriklerin sıkışmaması için insets.top ile dinamik üst boşluk bırakıyoruz
+          paddingTop: insets.top,
+        }}
+      >
+        {/* Başlık İçeriği (Profil Fotoğrafı ve Eğitmen Bilgileri) */}
+        <View
+          style={{
+            paddingHorizontal: 20,
+            paddingBottom: 16,
+            flexDirection: 'row',  // Yatay hizalama (Fotoğraf solda, yazılar sağda)
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          {/* Yuvarlak Profil Resmi (Avatar) */}
+          <Image
+            source={{
+              uri: 'https://avatars.githubusercontent.com/u/499550?v=4',
+            }}
+            style={{ width: 40, height: 40, borderRadius: 20 }} // Yarıçap genişliğin yarısı kadar olunca daire olur
+          />
+          
+          {/* Başlık Metinleri */}
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: '#f8fafc', fontWeight: '700', fontSize: 18 }}>
+              Instructor Dashboard
+            </Text>
+            <Text style={{ color: '#94a3b8' }}>
+              Welcome back! Review the highlights before you go live.
+            </Text>
+          </View>
+        </View>
+      </SafeAreaView>
+
+      {/* 3. SAYFANIN GERİ KALAN İÇERİĞİ (LATEST LESSONS KARTI) */}
+      <View style={{ flex: 1, padding: 24, gap: 16 }}>
+        <Text style={{ color: '#f8fafc', fontSize: 20, fontWeight: '600' }}>
+          Latest Lessons
+        </Text>
+        
+        {/* Ders Detay Kartı */}
+        <View
+          style={{
+            borderRadius: 16,
+            padding: 20,
+            backgroundColor: '#1f2937',
+            gap: 12,
+          }}
+        >
+          <Text style={{ color: '#38bdf8', fontWeight: '700' }}>
+            1. Core Components
+          </Text>
+          <Text style={{ color: '#cbd5f5', lineHeight: 20 }}>
+            Recap how to structure layouts with View, Text, and Image, backed by practical examples.
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// 4. ANA BİLEŞEN (NotchedHeaderDemo)
+export default function NotchedHeaderDemo() {
+  return (
+    // SafeAreaProvider: Safe Area context'in düzgün çalışabilmesi için tüm uygulamanın (veya ekranın) en dışını sarmalaması ZORUNLUDUR!
+    <SafeAreaProvider>
+      <HeaderContent />
+    </SafeAreaProvider>
+  );
+}
