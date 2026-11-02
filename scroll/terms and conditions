@@ -1,0 +1,94 @@
+// ==========================================
+// TermsAgreement.js - ScrollView Sonu Tespiti ve Sözleşme Onayı Örneği
+// ==========================================
+
+import { useRef, useState } from 'react';
+import { Button, SafeAreaView, ScrollView, Text, View } from 'react-native';
+
+// 1. UZUN METİN (TERMS): 'Terms of service' metnini 120 kez tekrarlayarak kaydırılabilir (scrollable) uzun bir alan oluşturur.
+const TERMS = `${'Terms of service '.repeat(120)}\n\nPlease confirm that you have read the agreement.`;
+
+export default function TermsAgreement() {
+  
+  // 2. STATE (DURUM) TANIMLAMALARI
+  const [accepted, setAccepted] = useState(false);       // Kullanıcı sözleşmeyi kabul etti mi? (true/false)
+  const [reachedEnd, setReachedEnd] = useState(false);   // Kullanıcı metnin en sonuna kadar kaydırdı mı? (true/false)
+  
+  // 3. REF (REFERANS) TANIMLAMALARI
+  const scrollViewRef = useRef(null);      // ScrollView bileşenini doğrudan kontrol etmek / manipüle etmek için referans
+  const requestedPosition = useRef(false); // Başlangıç pozisyonunun ayarlanıp ayarlanmadığını takip eden bayrak (flag)
+
+  // 4. KAYDIRMA OLAYINI YÖNETME FONKSİYONU (Çok Önemli Sınav Konusu!)
+  const handleScroll = (event) => {
+    // event.nativeEvent içinden gerekli 3 kritik değeri alıyoruz:
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    
+    // KAYDIRMA SONU HESAPLAMA FORMÜLÜ:
+    // layoutMeasurement.height (Görünen kutunun yüksekliği) + contentOffset.y (Yukarıdan kaydırılan miktar) 
+    // >= contentSize.height (Toplam içerik yüksekliği - 20 piksel pay)
+    const scrolledToBottom =
+      layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+      
+    // Eğer en alta ulaşıldıysa ve daha önce 'reachedEnd' true yapılmadıysa state'i güncelle
+    if (scrolledToBottom && !reachedEnd) {
+      setReachedEnd(true);
+    }
+  };
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan (#e2e8f0 açık gri arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#e2e8f0' }}>
+      <View style={{ flex: 1, padding: 24, gap: 16 }}>
+        
+        {/* Başlık */}
+        <Text style={{ fontSize: 22, fontWeight: '700', color: '#0f172a' }}>
+          Terms of Service
+        </Text>
+        
+        {/* 5. SCROLLVIEW (Kaydırılabilir Sözleşme Kutusu) */}
+        <ScrollView
+          ref={scrollViewRef}                   // Ref bağlandı
+          onScroll={handleScroll}               // Her kaydırma hareketinde handleScroll tetiklenir
+          scrollEventThrottle={16}              // onScroll'un ne sıklıkla tetikleneceğini belirler (16ms = akıcı 60fps)
+          contentContainerStyle={{
+            padding: 18,
+            backgroundColor: '#fff',
+            borderRadius: 16,
+            gap: 12,
+            minHeight: 400,
+          }}
+          // İçerik boyutu ilk yüklendiğinde veya değiştiğinde çalışır
+          onContentSizeChange={() => {
+            if (!requestedPosition.current && scrollViewRef.current) {
+              requestedPosition.current = true;
+              scrollViewRef.current.scrollTo({ y: 0, animated: false }); // Başlangıçta en üste konumlandırır
+            }
+          }}
+          nestedScrollEnabled
+        >
+          {/* Uzun Metin */}
+          <Text style={{ lineHeight: 22, color: '#334155' }}>{TERMS}</Text>
+        </ScrollView>
+        
+        {/* 6. ALT KISIM: Onay Butonu ve Dinamik Durum Yönetimi */}
+        <View style={{ marginTop: 8, marginBottom: 32 }}>
+          <Button
+            // DİNAMİK BUTON BAŞLIĞI: Kullanıcının durumuna göre buton yazısı değişir
+            title={
+              reachedEnd
+                ? accepted
+                  ? 'Accepted'
+                  : 'Accept terms'
+                : 'Scroll to the bottom to continue' // En alta inilmediyse bu yazar
+            }
+            // BUTONUN AKTİFLİK DURUMU: Kullanıcı en alta inmediyse VEYA zaten kabul ettiyse buton pasif (disabled) olur!
+            disabled={!reachedEnd || accepted}
+            onPress={() => setAccepted(true)}       // Tıklandığında kabul edildi durumunu true yapar
+            color={accepted ? '#22c55e' : '#2563eb'}  // Kabul edildiyse yeşil, edilmediyse mavi renk
+          />
+        </View>
+        
+      </View>
+    </SafeAreaView>
+  );
+}
