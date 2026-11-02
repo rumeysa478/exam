@@ -1,0 +1,85 @@
+// ==========================================
+// ParticipantSettings.js - Gelişmiş Ayarlar ve useMemo Örneği
+// ==========================================
+
+import { useMemo, useState } from 'react';
+import { SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
+import Checkbox from 'expo-checkbox';
+
+// Ayar seçeneklerinin listesi (Her birinin id ve ekranda görünecek label'ı var)
+const SETTINGS = [
+  { id: 'recordings', label: 'Share session recordings' },
+  { id: 'reminders', label: 'Send a reminder 1 hour before class' },
+  { id: 'survey', label: 'Trigger a mini survey after each lesson' },
+];
+
+export default function ParticipantSettings() {
+  
+  // 1. DİNAMİK STATE BAŞLANGICI (REDUCE)
+  // SETTINGS dizisini dönerek hepsinin başlangıç değerini otomatik olarak 'false' yapar:
+  // Çıktı: { recordings: false, reminders: false, survey: false }
+  const [options, setOptions] = useState(
+    SETTINGS.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
+  );
+
+  // 2. USEMEMO HOOK KULLANIMI
+  // Object.values(options).some(Boolean) -> Seçeneklerden en az BİR TANESİ bile true ise 'true' döner.
+  // useMemo, bu hesaplamayı gereksiz yere her render'da tekrarlamak yerine sadece 'options' değiştiğinde önbellekten (cache) alır.
+  const allActive = useMemo(() => Object.values(options).some(Boolean), [options]);
+
+  // 3. AYAR DEĞİŞTİRME FONKSİYONU
+  const toggle = (key, value) => {
+    // İlgili ayarın anahtarını (key) bulup yeni değeri (true/false) state'e günceller
+    setOptions((prev) => ({ ...prev, [key]: value }));
+  };
+
+  return (
+    // SafeAreaView: İçeriğin güvenli alanda kalmasını sağlar (#020617 koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#020617', padding: 24 }}>
+      
+      {/* Başlık */}
+      <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '600', marginBottom: 16 }}>
+        Participant Settings
+      </Text>
+      
+      {/* 4. SETTINGS DİZİSİNİ DÖNME (MAP) */}
+      {SETTINGS.map((setting) => (
+        <View
+          key={setting.id}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between', // Metni sola, checkbox'ı sağa yaslar
+            paddingVertical: 12,
+          }}
+        >
+          {/* Ayar Etiketi */}
+          <Text style={{ color: '#e2e8f0', fontSize: 16 }}>{setting.label}</Text>
+          
+          {/* Checkbox (Onay Kutusu) */}
+          <Checkbox
+            value={options[setting.id]} // O anki ayarın true/false durumu
+            onValueChange={(value) => toggle(setting.id, value)} // Değiştiğinde state'i güncelle
+            color={options[setting.id] ? '#38bdf8' : undefined} // İşaretliyse açık mavi renk (#38bdf8) olur
+          />
+        </View>
+      ))}
+
+      {/* 5. DİNAMİK KAYDET BUTONU */}
+      <TouchableOpacity
+        style={{
+          marginTop: 32,
+          // KOŞULLU STİL: Eğer en az bir kutu işaretlendiyse canlı mavi (#38bdf8), değilse sönük gri (#334155) olur
+          backgroundColor: allActive ? '#38bdf8' : '#334155',
+          borderRadius: 16,
+          paddingVertical: 16,
+          alignItems: 'center',
+        }}
+        disabled={!allActive} // Eğer hiçbiri seçili değilse butona tıklanamaz (pasif)
+      >
+        <Text style={{ color: '#0f172a', fontWeight: '700' }}>Save Settings</Text>
+      </TouchableOpacity>
+      
+    </SafeAreaView>
+  );
+}
