@@ -1,0 +1,77 @@
+// ==========================================
+// WeeklySchedule.js - Yatay Kaydırılabilir Kartlar Örneği
+// ==========================================
+
+import { SafeAreaView, ScrollView, Text, View } from 'react-native';
+
+// 1. HAFTALIK PLAN LİSTESİ (WEEKLY_PLAN)
+// Her günün (day), o gün işlenecek konunun (topic) ve sürenin (duration) yer aldığı sabit dizi.
+const WEEKLY_PLAN = [
+  { day: 'Monday', topic: 'Kickoff Session', duration: '40 min' },
+  { day: 'Tuesday', topic: 'Core Components', duration: '60 min' },
+  { day: 'Wednesday', topic: 'Navigation', duration: '50 min' },
+  { day: 'Thursday', topic: 'State Management', duration: '55 min' },
+  { day: 'Friday', topic: 'Performance', duration: '45 min' },
+];
+
+export default function WeeklySchedule() {
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
+      
+      {/* Üst Kapsayıcı: Dikeyde üstten ve alttan boşluk bırakır */}
+      <View style={{ paddingVertical: 32 }}>
+        
+        {/* Başlık Metni */}
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: '700',
+            marginLeft: 24,
+            color: '#f8fafc',
+          }}
+        >
+          Weekly Study Plan
+        </Text>
+        
+        {/* 2. YATAY SCROLLVIEW (Horizontal ScrollView - Çok Önemli Sınav Konusu!) */}
+        <ScrollView
+          horizontal                               // ÖNEMLİ: Listeyi dikey yerine yatay (yan yana) kaydırılabilir yapar!
+          showsHorizontalScrollIndicator={false}   // Ekranın altındaki kaydırma çubuğunu (scrollbar) gizler (daha şık görünüm için)
+          contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 16, gap: 16 }} // Yatay iç boşluklar ve kartlar arası 16 birim mesafe (gap)
+        >
+          {/* 3. DİZİYİ DÖNME (MAP): WEEKLY_PLAN dizisindeki her gün için ekrana yan yana kartlar basıyoruz */}
+          {WEEKLY_PLAN.map((item) => (
+            <View
+              key={item.day}                       // Her öğe için benzersiz anahtar (Gün adı)
+              style={{
+                width: 220,                        // Yatay kaydırmada her bir kartın sabit genişliği
+                padding: 20,
+                borderRadius: 20,
+                backgroundColor: '#1f2937',        // Kartların koyu gri arka planı
+                justifyContent: 'center',
+                gap: 10,                           // Kart içindeki metinler arası dikey boşluk
+              }}
+            >
+              {/* Gün Adı */}
+              <Text style={{ color: '#cbd5f5', fontSize: 16 }}>
+                {item.day}
+              </Text>
+              
+              {/* Konu Başlığı */}
+              <Text
+                style={{ color: '#f1f5f9', fontWeight: '600', fontSize: 20 }}
+              >
+                {item.topic}
+              </Text>
+              
+              {/* Süre Bilgisi */}
+              <Text style={{ color: '#94a3b8' }}>{item.duration}</Text>
+            </View>
+          ))}
+        </ScrollView>
+        
+      </View>
+    </SafeAreaView>
+  );
+}
