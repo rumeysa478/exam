@@ -1,0 +1,79 @@
+// ==========================================
+// CourseCard.js - İkon ve Favori Butonu Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Expo projelerinde hazır gelen vektörel ikon kütüphanesi
+
+export default function CourseCard() {
+  
+  // 1. STATE (DURUM) TANIMLAMASI
+  const [isFavorite, setFavorite] = useState(false); // Kurs favoride mi değil mi? (Başlangıç: false)
+  const courseTitle = 'React Native Core Components';    // Kurs başlığı değişkeni
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          padding: 24,
+        }}
+      >
+        {/* Ana Kart Konteyneri (Koyu gri arkaplan ve yuvarlatılmış köşeler) */}
+        <View
+          style={{
+            padding: 24,
+            borderRadius: 20,
+            backgroundColor: '#1f2937',
+            gap: 16,
+          }}
+        >
+          {/* Kurs Başlığı */}
+          <Text style={{ color: '#f8fafc', fontSize: 20, fontWeight: '700' }}>
+            {courseTitle}
+          </Text>
+          
+          {/* Açıklama Metni */}
+          <Text style={{ color: '#cbd5f5', lineHeight: 20 }}>
+            Add this course to your favorites for quick access and get notified
+            when new lessons drop.
+          </Text>
+          
+          {/* 2. ETKİLEŞİMLİ FAVORİ BUTONU (TouchableOpacity) */}
+          <TouchableOpacity
+            // Tıklandığında isFavorite değerini tersine çevirir (true -> false, false -> true)
+            onPress={() => setFavorite((prev) => !prev)}
+            activeOpacity={0.7} // Butona basıldığında oluşan şeffaflık efekti
+            style={{
+              alignSelf: 'flex-start', // ÖNEMLİ: Butonun tüm satırı kaplaması yerine sadece içeriği kadar yer kaplamasını sağlar!
+              flexDirection: 'row',    // İkon ile metni yan yana hizalar
+              gap: 8,                  // İkon ve metin arası boşluk
+              paddingVertical: 10,
+              paddingHorizontal: 16,
+              borderRadius: 999,       // Çok yüksek bir değer verilerek butonun kenarları tam yuvarlak (hap şeklinde) yapılır
+              // KOŞULLU STİL: Favoride ise turuncu/sarı (#f59e0b), değilse koyu gri (#334155) arkaplan
+              backgroundColor: isFavorite ? '#f59e0b' : '#334155',
+            }}
+          >
+            {/* 3. VECTOR ICONS (Ionicons Kullanımı - Sınavda Çıkabilir!) */}
+            <Ionicons
+              // KOŞULLU İKON: Favoride ise dolu yıldız ('star'), değilse boş yıldız ('star-outline') gösterir
+              name={isFavorite ? 'star' : 'star-outline'}
+              size={18}
+              color="#fef3c7"
+            />
+            
+            {/* 4. DİNAMİK BUTON METNİ */}
+            <Text style={{ color: '#fef3c7', fontWeight: '600' }}>
+              {isFavorite ? 'In favorites' : 'Add to favorites'}
+            </Text>
+          </TouchableOpacity>
+          
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
