@@ -1,0 +1,100 @@
+// ==========================================
+// SumCalculator.js - İki Sayıyı Toplama Uygulaması
+// ==========================================
+
+import { useState } from 'react';
+import { Button, SafeAreaView, Text, TextInput, View } from 'react-native';
+
+export default function SumCalculator() {
+  
+  // 1. STATE (DURUM) TANIMLAMALARI
+  const [first, setFirst] = useState('');     // Birinci sayı girişini metin olarak tutar
+  const [second, setSecond] = useState('');   // İkinci sayı girişini metin olarak tutar
+  const [result, setResult] = useState(null); // Toplam sonucunu tutar (başlangıçta null)
+
+  // 2. TOPLAMA İŞLEMİNİ GERÇEKLEŞTİREN FONKSİYON
+  const handleSum = () => {
+    // TextInput'tan gelen değerler metin (string) olduğundan Number() ile sayıya dönüştürüyoruz
+    const total = Number(first) + Number(second);
+    
+    // Number.isFinite(total): Çıkan sonucun geçerli bir sonlu sayı olup olmadığını kontrol eder.
+    // Eğer geçerli bir sayıysa 'total' değerini kaydet, değilse (boş veya harf girildiyse) 'null' yap.
+    setResult(Number.isFinite(total) ? total : null);
+  };
+
+  return (
+    // SafeAreaView: İçeriğin telefonun çentik ve kenar boşluklarında kalmasını engeller (#f8f9fa açık gri arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f8f9fa' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          padding: 24,
+          gap: 16, // Bileşenler arası dikey boşluk
+        }}
+      >
+        {/* Uygulama Başlığı */}
+        <Text style={{ fontSize: 20, fontWeight: '600', color: '#0f172a' }}>
+          Add two numbers
+        </Text>
+        
+        {/* Kart Konteyneri (Beyaz arka plan ve hafif gölge efekti) */}
+        <View
+          style={{
+            borderRadius: 16,
+            backgroundColor: '#fff',
+            padding: 20,
+            gap: 16,
+            shadowColor: '#000',
+            shadowOpacity: 0.05,
+            shadowRadius: 12,
+            elevation: 2, // Android gölge derinliği
+          }}
+        >
+          {/* 1. Sayı Giriş Alanı */}
+          <TextInput
+            placeholder="First number"
+            keyboardType="numeric" // Klavyeyi sadece rakam çıkacak şekilde ayarlar
+            value={first}
+            onChangeText={setFirst} // Yazıldıkça 'first' state'ini günceller
+            style={{
+              borderWidth: 1,
+              borderColor: '#d4d4d8',
+              borderRadius: 10,
+              paddingHorizontal: 12,
+              paddingVertical: 12,
+            }}
+          />
+          
+          {/* 2. Sayı Giriş Alanı */}
+          <TextInput
+            placeholder="Second number"
+            keyboardType="numeric" // Rakam klavyesi
+            value={second}
+            onChangeText={setSecond} // Yazıldıkça 'second' state'ini günceller
+            style={{
+              borderWidth: 1,
+              borderColor: '#d4d4d8',
+              borderRadius: 10,
+              paddingHorizontal: 12,
+              paddingVertical: 12,
+            }}
+          />
+          
+          {/* Hesapla Butonu: Tıklandığında handleSum fonksiyonunu tetikler */}
+          <Button title="Calculate sum" onPress={handleSum} />
+          
+          {/* Sonuç Alanı */}
+          <View>
+            <Text style={{ color: '#475569' }}>Result:</Text>
+            {/* Koşullu Metin: Eğer sonuç null ise uyarı yazısı göster, değilse hesaplanan sonucu yazdır */}
+            <Text style={{ fontSize: 24, fontWeight: '700', color: '#2563eb' }}>
+              {result === null ? 'Enter two valid numbers' : result}
+            </Text>
+          </View>
+          
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
