@@ -1,0 +1,76 @@
+// ==========================================
+// BioField.js - Çok Satırlı TextInput ve Karakter Sayacı Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { SafeAreaView, Text, TextInput, View } from 'react-native';
+
+// 1. SABİT DEĞER (MAX_LENGTH)
+const MAX_LENGTH = 120; // Kullanıcının yazabileceği en fazla karakter sınırı
+
+export default function BioField() {
+  
+  // 2. STATE (DURUM) TANIMLAMASI
+  const [bio, setBio] = useState(''); // Kullanıcının girdiği biyografi metnini tutar (Başlangıç boş string)
+
+  // 3. DİNAMİK HESAPLAMALAR
+  const remaining = MAX_LENGTH - bio.length; // Kalan karakter sayısı (Maksimum - o an yazılan uzunluk)
+  const limitReached = remaining <= 10;       // Sınra 10 karakter veya daha az kaldı mı? (true/false döner)
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#f8fafc açık gri arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          padding: 24,
+          gap: 12,
+        }}
+      >
+        {/* Başlık Metni */}
+        <Text style={{ fontSize: 22, fontWeight: '700', color: '#0f172a' }}>
+          Profile Summary
+        </Text>
+        
+        {/* Beyaz Kart Konteyneri (Gölge efektleri ile) */}
+        <View
+          style={{
+            borderRadius: 16,
+            backgroundColor: '#fff',
+            padding: 20,
+            gap: 12,
+            shadowColor: '#000',
+            shadowOpacity: 0.05,
+            shadowRadius: 10,
+            elevation: 2, // Android gölge derinliği
+          }}
+        >
+          {/* 4. TEXTINPUT (Çok Satırlı Metin Giriş Alanı - Çok Önemli Sınav Konusu!) */}
+          <TextInput
+            multiline                                // ÖNEMLİ: Alanı tek satır yerine dikeyde büyüyen çok satırlı (textarea benzeri) yapar!
+            maxLength={MAX_LENGTH}                   // ÖNEMLİ: Klavyeden bu sınırdan fazla karakter yazılmasını otomatik olarak engeller!
+            value={bio}                              // Girdi değerini state'e bağlar
+            onChangeText={setBio}                    // Metin her değiştiğinde 'bio' state'ini günceller
+            placeholder="Introduce yourself in a few sentences..."
+            style={{
+              minHeight: 120,                        // Alanın başlangıçtaki minimum dikey yüksekliği
+              borderWidth: 1,
+              borderColor: '#d4d4d8',
+              borderRadius: 10,
+              padding: 14,
+              textAlignVertical: 'top',              // ÖNEMLİ (Android için): Çok satırlı metinlerde imlecin ve yazının en üstten başlamasını sağlar!
+            }}
+          />
+          
+          {/* 5. DİNAMİK KARAKTER SAYACI VE KOŞULLU RENK */}
+          <Text style={{ color: limitReached ? '#f97316' : '#475569' }}>
+            {/* Eğer sınıra son 10 karakter kala yaklaşılırsa yazı turuncu (#f97316) olur, normalde gri (#475569) kalır */}
+            Characters remaining: {remaining}
+          </Text>
+        </View>
+        
+      </View>
+    </SafeAreaView>
+  );
+}
