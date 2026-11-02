@@ -1,0 +1,193 @@
+// ==========================================
+// ImagePlayground.js - Gelişmiş Resim Yönetimi ve Sınav Projesi
+// ==========================================
+
+import { useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+// 1. SABİT DEĞERLER (URL'ler ve Modlar)
+const PRIMARY_URI = 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518'; // Asıl yüklenecek ana resim adresi
+const FALLBACK_URI =
+  'https://ui-avatars.com/api/?background=2563eb&color=fff&name=React+Native'; // Ana resim patlarsa (hata verirse) gösterilecek yedek resim
+const MODES = ['cover', 'contain', 'stretch', 'center', 'repeat']; // Resmin Kutuya Sığma Biçimleri (Resize Modes)
+
+export default function ImagePlayground() {
+  
+  // 2. STATE (DURUM) TANIMLAMALARI
+  const [uri, setUri] = useState(PRIMARY_URI);         // O an ekranda gösterilecek resmin URL adresi
+  const [status, setStatus] = useState('Ready');       // Resmin yüklenme durumu ('Ready', 'loading', 'loaded', 'fallback')
+  const [resizeMode, setResizeMode] = useState(MODES[0]); // Resmin kutu içindeki yerleşim modu (Varsayılan: 'cover')
+  const [blurEnabled, setBlurEnabled] = useState(false);  // Resme bulanıklık (blur) efekti verilip verilmediği (true/false)
+
+  // 3. USEMEMO İLE DURUM MESAJI OPTİMİZASYONU
+  // 'status' her değiştiğinde kullanıcının göreceği bilgilendirme metnini performanslı bir şekilde belirler.
+  const infoText = useMemo(() => {
+    switch (status) {
+      case 'loading':
+        return 'Image is loading...';
+      case 'loaded':
+        return 'Image loaded successfully.';
+      case 'fallback':
+        return 'Primary source failed, showing fallback image.';
+      default:
+        return 'Ready.';
+    }
+  }, [status]);
+
+  // 4. HATA SİMÜLASYONU FONKSİYONU
+  // Geçersiz bir URL vererek onError tetiklenmesini ve fallback resme geçişi test eder.
+  const triggerError = () => {
+    setStatus('loading');
+    setUri('https://invalid-url.example.com/image.jpg'); // Hatalı URL
+  };
+
+  // 5. ANA RESME GERİ DÖNÜŞ FONKSİYONU
+  const enablePrimary = () => {
+    setStatus('loading');
+    setUri(PRIMARY_URI); // Orijinal URL'ye geri dön
+  };
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
+      <View
+        style={{
+          flex: 1,
+          padding: 24,
+          justifyContent: 'center',
+          gap: 16,
+        }}
+      >
+        {/* Başlık */}
+        <Text style={{ color: '#f8fafc', fontSize: 22, fontWeight: '700' }}>
+          Image playground
+        </Text>
+        
+        {/* Anlık Durum Bilgi Satırı */}
+        <Text style={{ color: '#94a3b8' }}>
+          Active `resizeMode`: <Text style={{ fontWeight: '700' }}>{resizeMode}</Text> ·
+          `blurRadius`: {blurEnabled ? 18 : 0}
+        </Text>
+
+        {/* 6. RESİM GÖSTERTME KUTUSU (CONTAINER) */}
+        <View
+          style={{
+            height: 220,
+            borderRadius: 20,
+            backgroundColor: '#1f2937',
+            overflow: 'hidden', // Kutunun dışına taşan resim kısımlarını gizler (BorderRadius'un çalışması için şarttır!)
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {/* Yükleniyorsa ortada dönecek olan çark (ActivityIndicator) */}
+          {status === 'loading' && (
+            <ActivityIndicator color="#38bdf8" size="large" />
+          )}
+          
+          {/* 7. IMAGE (RESİM) BİLEŞENİ - SINAVDA EN ÇOK SORULAN YER */}
+          <Image
+            source={{ uri }}                               // Gösterilecek resmin kaynağı (state'den gelir)
+            style={{ width: '100%', height: '100%' }}     // Kutuyu tamamen kapla
+            resizeMode={resizeMode}                        // Resmin kutu içine nasıl oturacağını belirler (cover, contain vs.)
+            blurRadius={blurEnabled ? 18 : 0}              // Eğer blur aktifse 18 birim bulanıklaştır, değilse 0 (net) yap
+            
+            // Yaşam Döngüsü Olayları (Lifecycle Events):
+            onLoadStart={() => setStatus('loading')}       // Resim yüklenmeye başladığında
+            onLoad={() => setStatus('loaded')}             // Resim başarıyla yüklendiğinde
+            
+            // Hata Yakalama (Önemli Sınav Konusu!):
+            onError={() => {
+              setStatus('fallback');                       // Durumu fallback'e çek
+              setUri(FALLBACK_URI);                        // URL'yi yedek resim ile değiştir
+            }}
+          />
+        </View>
+
+        {/* Bilgilendirme Metni */}
+        <Text style={{ color: '#e2e8f0' }}>{infoText}</Text>
+
+        {/* 8. RESİM BOYUTLANDIRMA MODLARI SEÇİM PANELİ (MODES MAP) */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {MODES.map((mode) => {
+            const isActive = mode === resizeMode; // O an seçili olan mod mu?
+            return (
+              <TouchableOpacity
+                key={mode}
+                onPress={() => setResizeMode(mode)} // Tıklandığında resizeMode state'ini değiştir
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 14,
+                  borderRadius: 999,
+                  // Seçiliyse açık mavi (#38bdf8), değilse koyu gri (#1f2937) arkaplan
+                  backgroundColor: isActive ? '#38bdf8' : '#1f2937',
+                }}
+              >
+                <Text style={{ color: isActive ? '#0f172a' : '#e2e8f0' }}>
+                  {mode}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* 9. KONTROL BUTONLARI (Blur, Hata Simülasyonu, Orijinale Dönüş) */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          
+          {/* Bulanıklık Açma / Kapatma Butonu */}
+          <TouchableOpacity
+            onPress={() => setBlurEnabled((prev) => !prev)} // true ise false, false ise true yap
+            style={{
+              paddingVertical: 12,
+              paddingHorizontal: 16,
+              borderRadius: 12,
+              backgroundColor: blurEnabled ? '#f97316' : '#1e293b',
+            }}
+          >
+            <Text style={{ color: '#f8fafc', fontWeight: '600' }}>
+              {blurEnabled ? 'Disable blur' : 'Enable blur'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Hata Simülasyonu Butonu (onError test etmek için) */}
+          <TouchableOpacity
+            onPress={triggerError}
+            style={{
+              paddingVertical: 12,
+              paddingHorizontal: 16,
+              borderRadius: 12,
+              backgroundColor: '#ef4444', // Kırmızı hata butonu
+            }}
+          >
+            <Text style={{ color: '#fff', fontWeight: '600' }}>
+              Simulate failure
+            </Text>
+          </TouchableOpacity>
+
+          {/* Orijinal Resme Dönüş Butonu */}
+          <TouchableOpacity
+            onPress={enablePrimary}
+            style={{
+              paddingVertical: 12,
+              paddingHorizontal: 16,
+              borderRadius: 12,
+              backgroundColor: '#22c55e', // Yeşil başarı butonu
+            }}
+          >
+            <Text style={{ color: '#0f172a', fontWeight: '600' }}>
+              Back to original
+            </Text>
+          </TouchableOpacity>
+          
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
