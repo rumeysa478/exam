@@ -1,0 +1,125 @@
+// ==========================================
+// InfiniteNotes.js - Sonsuz Kaydırma ve Sayfalama Örneği
+/*Bu kod, React Native dünyasında sonsuz kaydırma (Infinite Scroll / Pagination), aşağı çekerek yenileme (Pull-to-Refresh) ve asenkron veri yükleme simülasyonunu (fetchPage) yöneten son derece profesyonel ve gelişmiş bir Ders Notları Akışı (InfiniteNotes) uygulamasıdır.*/
+// ==========================================
+
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  SafeAreaView,
+  Text,
+  View,
+} from 'react-native';
+
+// MÜKEMMEL BİR API SİMÜLASYONU:
+// Belirli bir sayfa (page) numarasına göre sahte 6'şar adet ders notu üreten ve 0.6 saniye gecikme (bekleme) ekleyen asenkron fonksiyon.
+const fetchPage = async (page) => {
+  await new Promise((resolve) => setTimeout(resolve, 600)); // Sunucu yanıt süresini taklit eder
+  return Array.from({ length: 6 }, (_, index) => {
+    const id = (page - 1) * 6 + index + 1;
+    return { id: String(id), title: `Lesson Note #${id}` };
+  });
+};
+
+export default function InfiniteNotes() {
+  
+  // 1. STATE (DURUM) TANIMLAMALARI
+  const [notes, setNotes] = useState([]);         // Listelenecek tüm notların dizisi
+  const [page, setPage] = useState(1);            // Sıradaki yüklenecek sayfa numarası
+  const [loadingMore, setLoadingMore] = useState(false); // Sayfanın en altına gelindiğinde yeni veriler yüklenirken dönecek gösterge durumu
+  const [refreshing, setRefreshing] = useState(false);    // Sayfa yukarıdan aşağı çekilip yenilenirken dönecek gösterge durumu
+
+  // 2. SAYFA YÜKLEME FONKSİYONU (useMemo / useCallback ile optimize edilmiş)
+  const loadPage = useCallback(
+    async (pageToLoad, isRefresh = false) => {
+      // Eğer halihazırda yeni veri yükleniyorsa veya yenileme yapılıyorsa üst üste istek atılmasını önle (Koruma kalkanı)
+      if (loadingMore || refreshing) return;
+      
+      if (isRefresh) {
+        setRefreshing(true); // Yenileniyor durumunu aktif et
+      } else {
+        setLoadingMore(true); // Daha fazla yükleniyor durumunu aktif et
+      }
+
+      // Sahte API'den yeni sayfadaki verileri çek
+      const newNotes = await fetchPage(pageToLoad);
+      
+      // State Güncellemesi:
+      // Eğer yenileme (refresh) yapıldıysa eski listeyi silip yenileri koy, 
+      // normal aşağı kaydırma ise eski notların üzerine yeni notları ekle ([...prev, ...newNotes])
+      setNotes((prev) => (isRefresh ? newNotes : [...prev, ...newNotes]));
+      
+      setPage(pageToLoad + 1); // Bir sonraki istek için sayfa numarasını 1 artır
+      setLoadingMore(false);   // Yükleme animasyonunu kapat
+      setRefreshing(false);    // Yenileme animasyonunu kapat
+    },
+    [loadingMore, refreshing]
+  );
+
+  // 3. İLK AÇILIŞ (MOUNT): Bileşen ekrana ilk geldiğinde 1. sayfayı yenileme modunda yükle
+  useEffect(() => {
+    loadPage(1, true);
+  }, [loadPage]);
+
+  return (
+    // SafeAreaView: İçeriğin telefonun çentik ve kenar boşluklarında kalmasını engeller (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
+      
+      {/* 4. FLATLIST (Performanslı ve Sonsuz Kaydırılabilir Liste) */}
+      <FlatList
+        data={notes}                              // Gösterilecek notlar dizisi
+        keyExtractor={(item) => item.id}          // Her eleman için benzersiz ID
+        contentContainerStyle={{ padding: 24, gap: 16 }} // Liste içi boşluklar ve öğeler arası mesafe
+        
+        // renderItem: Dizideki her bir not kartını ekranda çizer
+        renderItem={({ item }) => (
+          <View
+            style={{
+              padding: 18,
+              borderRadius: 14,
+              backgroundColor: '#1f2937', // Kartların koyu gri arka planı
+            }}
+          >
+            <Text style={{ fontSize: 16, color: '#f8fafc' }}>{item.title}</Text>
+          </View>
+        )}
+        
+        // refreshControl: Listeyi yukarıdan aşağı çekince tetiklenen yenileme mekanizması
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}               // Yenileniyor mu?
+            onRefresh={() => loadPage(1, true)}   // Çekildiğinde 1. sayfayı baştan yükle
+            tintColor="#38bdf8"                   // Yüklenme çarkının rengi (Açık Mavi)
+          />
+        }
+        
+        // onEndReached: Kullanıcı listenin sonuna yaklaştığında yeni sayfa yükleme fonksiyonunu tetikler
+        onEndReached={() => loadPage(page)}
+        onEndReachedThreshold={0.4} // Listenin %40'ına gelindiğinde erken yükleme başlatır
+        
+        // ListFooterComponent: Listenin en altında (yeni sayfa yüklenirken) görünecek dönen yüklenme çarkı
+        ListFooterComponent={
+          loadingMore ? (
+            <ActivityIndicator size="small" color="#38bdf8" />
+          ) : null
+        }
+        
+        // ListHeaderComponent: Listenin en başında sabit duracak başlık metni
+        ListHeaderComponent={() => (
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: '700',
+              color: '#f8fafc',
+              marginBottom: 8,
+            }}
+          >
+            Lesson Notes Feed
+          </Text>
+        )}
+      />
+    </SafeAreaView>
+  );
+}
