@@ -1,0 +1,105 @@
+// ==========================================
+// ButtonExample.js - React Native Buton Örnekleri
+// ==========================================
+
+import React from 'react';
+import { View, Text, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
+
+export default function ButtonExample() {
+  
+  // Butona tıklandığında çalışacak örnek fonksiyon
+  const handleCustomPress = () => {
+    Alert.alert("Tebrikler!", "Özel tasarlanmış butona tıkladın! 🚀");
+  };
+
+  return (
+    <View style={styles.container}>
+      
+      {/* Bölüm Başlığı */}
+      <Text style={styles.title}>Button Örnekleri</Text>
+      
+      {/* 1. YÖNTEM: React Native'in yerleşik (built-in) standart Button bileşeni */}
+      <View style={styles.buttonWrapper}>
+        <Button 
+          title="Standart Buton (Button)"
+          color="#007AFF" // Mavi renk
+          onPress={() => Alert.alert("Bilgi", "Standart butona basıldı!")}
+        />
+      </View>
+
+      {/* 2. YÖNTEM: TouchableOpacity ile tamamen özelleştirilebilir (custom) buton */}
+      <TouchableOpacity style={styles.customButton} onPress={handleCustomPress}>
+        <Text style={styles.customButtonText}>Özel Tasarım Buton (TouchableOpacity)</Text>
+      </TouchableOpacity>
+      
+    </View>
+  );
+}
+
+// ==========================================
+// TASARIM VE STİL TANIMLAMALARI (StyleSheet)
+// ==========================================
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#ffffff', // Beyaz kart arka planı
+    padding: 20,                // İç boşluk
+    borderRadius: 10,           // Köşeleri yuvarla
+    marginBottom: 15,           // Alt boşluk
+    shadowColor: '#000',        // iOS gölge
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,               // Android gölge
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+    textAlign: 'center',
+  },
+  buttonWrapper: {
+    marginBottom: 15,           // Standart buton altındaki boşluk
+  },
+  customButton: {
+    backgroundColor: '#28A745', // Yeşil buton arka planı
+    padding: 15,                // İç boşluk
+    borderRadius: 8,            // Köşe yuvarlama
+    alignItems: 'center',       // İçindeki yazıyı ortalama
+  },
+  customButtonText: {
+    color: 'white',             // Beyaz yazı rengi
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
+
+
+-----------------------------------------------------------------------
+
+
+// ==========================================
+// App.js - Ana Sayfa (Modüler Birleşim)
+// ==========================================
+
+import React from 'react';
+import { ScrollView } from 'react-native';
+
+// Bileşenleri ilgili klasör yollarından içe aktarıyoruz (import)
+import MessageExample from './components/MessageExample';
+import ButtonExample from './components/ButtonExample';
+
+export default function App() {
+  return (
+    // ScrollView: İçerik ekrana sığmadığında dikey olarak kaydırılabilmesini sağlar
+    <ScrollView style={{ flex: 1, padding: 20, backgroundColor: '#f0f4f8' }}>
+      
+      {/* Az önce öğrendiğimiz Props kullanan mesaj bileşeni */}
+      <MessageExample />
+      
+      {/* Yeni oluşturduğumuz buton bileşeni */}
+      <ButtonExample />
+      
+    </ScrollView>
+  );
+}
