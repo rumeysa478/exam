@@ -1,0 +1,111 @@
+// ==========================================
+// SimpleCounter.js - Basit Sayaç Örneği
+// ==========================================
+
+// 1. Gerekli kütüphane ve bileşenleri içe aktarıyoruz
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+export default function SimpleCounter() {
+  
+  // 2. STATE (DURUM) TANIMLAMASI
+  // count: Sayacın o anki değerini tutar (Başlangıç değeri: 0)
+  // setCount: Sayacın değerini değiştirmek ve ekranda güncellenmesini sağlamak için kullanılan fonksiyon
+  const [count, setCount] = useState(0);
+
+  // 3. ARTIRMA FONKSİYONU
+  const increment = () => {
+    setCount(count + 1); // Mevcut sayının üzerine 1 ekler ve state'i günceller
+  };
+
+  // 4. AZALTMA FONKSİYONU
+  const decrement = () => {
+    setCount(count - 1); // Mevcut sayıdan 1 çıkarır ve state'i günceller
+  };
+
+  // 5. SIFIRLAMA FONKSİYONU
+  const reset = () => {
+    setCount(0); // Sayacı doğrudan 0'a eşitleer
+  };
+
+  // 6. ARAYÜZÜN OLUŞTURULDUĞU YER (JSX Return)
+  return (
+    <View style={styles.container}>
+      
+      {/* Bileşen Başlığı */}
+      <Text style={styles.title}>Simple Counter</Text>
+      
+      {/* Anlık Sayaç Değeri (State içindeki count değişkeni ekrana yazdırılıyor) */}
+      <Text style={styles.countText}>{count}</Text>
+      
+      {/* Artırma ve Azaltma Butonlarını Yan Yana Tutan Konteyner */}
+      <View style={styles.buttonContainer}>
+        
+        {/* Azaltma Butonu (-): Tıklandığında decrement fonksiyonunu tetikler */}
+        <TouchableOpacity style={styles.button} onPress={decrement}>
+          <Text style={styles.buttonText}>-</Text>
+        </TouchableOpacity>
+        
+        {/* Artırma Butonu (+): Tıklandığında increment fonksiyonunu tetikler */}
+        <TouchableOpacity style={styles.button} onPress={increment}>
+          <Text style={styles.buttonText}>+</Text>
+        </TouchableOpacity>
+        
+      </View>
+      
+      {/* Sıfırlama Butonu (Reset): Tıklandığında reset fonksiyonunu tetikler */}
+      <TouchableOpacity style={styles.resetButton} onPress={reset}>
+        <Text style={styles.buttonText}>Reset</Text>
+      </TouchableOpacity>
+      
+    </View>
+  );
+}
+
+// ==========================================
+// 7. TASARIM VE STİL TANIMLAMALARI (StyleSheet)
+// ==========================================
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,                    // Ekranın tamamını kapla
+    justifyContent: 'center',   // Dikeyde tam ortala
+    alignItems: 'center',       // Yatayda tam ortala
+    padding: 20,                // Kenarlardan iç boşluk bırak
+  },
+  title: {
+    fontSize: 24,               // Başlık yazı boyutu
+    fontWeight: 'bold',         // Kalın yazı tipi
+    marginBottom: 20,           // Alttan boşluk
+    color: '#333',              // Koyu gri yazı rengi
+  },
+  countText: {
+    fontSize: 48,               // Büyük sayaç rakamı boyutu
+    fontWeight: 'bold',         // Kalın yazı tipi
+    marginBottom: 30,           // Alttan boşluk
+    color: '#007AFF',           // Mavi sayaç rengi
+  },
+  buttonContainer: {
+    flexDirection: 'row',       // Butonları yan yana diz
+    marginBottom: 20,           // Alttan boşluk
+  },
+  button: {
+    backgroundColor: '#007AFF', // Mavi buton arka planı
+    padding: 20,                // İç boşluk
+    borderRadius: 50,           // Dairesel görünüm için köşe yuvarlama
+    margin: 10,                 // Butonlar arası dış boşluk
+    minWidth: 60,               // Minimum genişlik
+    alignItems: 'center',       // İçindeki sembolü ortala
+  },
+  resetButton: {
+    backgroundColor: '#DC3545', // Kırmızı reset butonu arka planı
+    padding: 15,                // İç boşluk
+    borderRadius: 8,            // Köşe yuvarlama
+    minWidth: 100,              // Minimum genişlik
+    alignItems: 'center',       // İçindeki yazıyı ortala
+  },
+  buttonText: {
+    color: 'white',             // Beyaz yazı rengi
+    fontSize: 20,               // Yazı boyutu
+    fontWeight: 'bold',         // Kalın yazı tipi
+  },
+});
