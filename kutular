@@ -1,0 +1,96 @@
+// ==========================================
+// App.js - React Native Değişken Örneği
+// ==========================================
+
+// 1. Gerekli kütüphaneleri ve bileşenleri içe aktarıyoruz (Import)
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+
+export default function App() {
+  
+  // 2. SABİTLER (const): Değeri hiç değişmeyecek veriler için kullanılır
+  const appName = "React Native Application";
+  const version = "1.0.0";
+  
+  // 3. DEĞİŞKENLER (let): Değeri sonradan güncellenebilecek veriler için kullanılır
+  let userCount = 0;
+  let isOnline = true;
+  
+  // Değişkenlerin değerini hemen burada güncelliyoruz (Reassignment)
+  userCount = userCount + 1; // userCount artık 1 oldu
+  isOnline = false;          // isOnline artık false oldu
+  
+  // 4. ARAYÜZÜN OLUŞTURULDUĞU YER (JSX Return)
+  return (
+    // SafeAreaView: İçeriğin telefonun çentiklerine (notch) taşmasını engeller
+    <SafeAreaView style={styles.container}>
+      
+      {/* Ana Ekran Başlığı */}
+      <Text style={styles.title}>Değişken Kullanım Örneği</Text>
+      
+      {/* Uygulama Adı Kutusu */}
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>App Name:</Text>
+        {/* Süslü parantez {} içinde JavaScript değişkeni ekrana yazdırılıyor */}
+        <Text style={styles.value}>{appName}</Text>
+      </View>
+      
+      {/* Versiyon Kutusu */}
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Version:</Text>
+        <Text style={styles.value}>{version}</Text>
+      </View>
+      
+      {/* Kullanıcı Sayısı Kutusu */}
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>User Count (Güncellendi):</Text>
+        <Text style={styles.value}>{userCount}</Text>
+      </View>
+      
+      {/* Çevrimiçi Durumu Kutusu */}
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Online:</Text>
+        {/* Ternary operatör (koşul ? doğruysa : yanlışsa) kullanılıyor */}
+        <Text style={styles.value}>{isOnline ? 'Yes' : 'No'}</Text>
+      </View>
+      
+    </SafeAreaView>
+  );
+}
+
+// ==========================================
+// 5. TASARIM VE STİL TANIMLAMALARI (StyleSheet)
+// ==========================================
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,                    // Ekranın tamamını kapla
+    backgroundColor: '#f7fafc', // Hafif gri arka plan rengi
+    padding: 20,                // Kenarlardan boşluk bırak
+    justifyContent: 'center',   // İçeriği dikeyde tam ortala
+  },
+  title: {
+    fontSize: 24,               // Yazı boyutu
+    fontWeight: 'bold',         // Kalın yazı tipi
+    textAlign: 'center',        // Ortalanmış metin
+    marginBottom: 30,           // Alttan boşluk
+    color: '#2d3748',           // Koyu gri yazı rengi
+  },
+  infoBox: {
+    backgroundColor: '#ffffff', // Beyaz kutu arka planı
+    padding: 15,                // İç boşluk (padding)
+    borderRadius: 8,            // Köşe yuvarlama
+    marginBottom: 10,           // Kutular arası alt boşluk
+    borderLeftWidth: 4,         // Sol kenar çizgisi kalınlığı
+    borderLeftColor: '#007AFF', // Sol kenar çizgi rengi (Mavi)
+  },
+  label: {
+    fontSize: 14,               // Etiket yazı boyutu
+    color: '#666',              // Gri etiket rengi
+    marginBottom: 5,            // Etiket ile değer arası boşluk
+  },
+  value: {
+    fontSize: 16,               // Değer yazı boyutu
+    fontWeight: '600',          // Yarı kalın yazı
+    color: '#333',              // Koyu değer rengi
+  },
+});
