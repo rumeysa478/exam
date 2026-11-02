@@ -1,0 +1,78 @@
+// ==========================================
+// ResponsiveGrid.js - Responsive Grid ve onLayout Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { SafeAreaView, View, Text } from 'react-native';
+
+// 1. SABİT KURS BAŞLIKLARI LİSTESİ
+const COURSES = [
+  'Core Components',
+  'State Management',
+  'Navigation',
+  'Performance',
+  'Testing',
+  'Deployment',
+];
+
+export default function ResponsiveGrid() {
+  
+  // 2. STATE (DURUM) TANIMLAMASI
+  const [cardsPerRow, setCardsPerRow] = useState(2); // Bir satırda kaç kart olacağını tutar (Varsayılan: 2)
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#f8fafc açık gri arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+      
+      {/* 3. ANA KAPLAYICI VE ONLAYOUT OLAYI (Çok Önemli Sınav Konusu!) */}
+      <View
+        style={{ flex: 1, padding: 24 }}
+        // onLayout: Bileşen ekrana ilk yerleştiğinde veya ekran boyutu değiştiğinde (örneğin telefon döndürüldüğünde) tetiklenir!
+        onLayout={(event) => {
+          // event.nativeEvent.layout içinden konteynerin o anki genişliğini (width) alıyoruz
+          const { width } = event.nativeEvent.layout;
+          
+          // EĞER genişlik 500 pikselden büyükse (tablet veya yatay mod) bir satırda 3 kart göster, değilse (telefon) 2 kart göster
+          setCardsPerRow(width > 500 ? 3 : 2);
+        }}
+      >
+        {/* Başlık Metni */}
+        <Text style={{ fontSize: 22, fontWeight: '700', marginBottom: 16 }}>
+          Course Topics
+        </Text>
+        
+        {/* 4. GRID CONTAINER (Flexbox Wrap - Sınav Sorusu!) */}
+        <View
+          style={{
+            flexDirection: 'row',          // ÖNEMLİ: Öğeleri alt alta değil yan yana dizer
+            flexWrap: 'wrap',              // ÖNEMLİ: Satıra sığmayan elemanların alt satıra (wrap) kaymasını sağlar!
+            gap: 16,                       // Kartlar arasındaki yatay ve dikey boşluk
+          }}
+        >
+          {/* 5. DİZİYİ DÖNME VE DİNAMİK GENİŞLİK HESAPLAMA */}
+          {COURSES.map((title) => (
+            <View
+              key={title}
+              style={{
+                // DİNAMİK GENİŞLİK FORMÜLÜ (Çok Önemli!):
+                // 100 / cardsPerRow -> Her karta düşen yüzde (örn: 2 kart için %50, 3 kart için %33.3)
+                // - 4 -> Gap boşluklarının hesapta taşma yapmaması için bırakılan güvenlik payı yüzde oranı
+                width: `${100 / cardsPerRow - 4}%`,
+                
+                padding: 18,
+                borderRadius: 16,
+                backgroundColor: '#e2e8f0', // Kartların arka planı
+              }}
+            >
+              {/* Kart İçindeki Başlık */}
+              <Text style={{ fontWeight: '600', color: '#1f2937' }}>
+                {title}
+              </Text>
+            </View>
+          ))}
+        </View>
+        
+      </View>
+    </SafeAreaView>
+  );
+}
