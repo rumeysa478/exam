@@ -1,0 +1,48 @@
+// ==========================================
+// WelcomeMessage.js - useEffect Hook Kullanım Örneği
+// ==========================================
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+export default function WelcomeMessage() {
+  
+  // 1. STATE (DURUM) TANIMLAMASI
+  // message: Başlangıçta ekranda "Loading..." (Yükleniyor...) yazmasını sağlar.
+  const [message, setMessage] = useState('Loading...');
+
+  // 2. USEEFFECT HOOK KULLANIMI
+  // useEffect, bileşen ekrana ilk yüklendiğinde (mount olduğunda) yan etkileri (API çağrısı, zamanlayıcı vb.) yönetmek için kullanılır.
+  useEffect(() => {
+    // setTimeout: 2000 milisaniye (2 saniye) sonra içindeki kodu çalıştırır
+    setTimeout(() => {
+      setMessage('Welcome!'); // 2 saniye sonra mesajı "Welcome!" olarak değiştirir ve ekranı günceller
+    }, 2000);
+    
+  }, []); // 3. BAĞIMLILIK DİZİSİ (Dependency Array): 
+          // Köşeli parantez [] boş bırakıldığı için bu useEffect SADECE bileşen ilk açıldığında (ilk render'da) BİR KERE çalışır.
+
+  return (
+    <View style={styles.container}>
+      {/* 4. ARAYÜZ */}
+      {/* İlk 2 saniye "Loading...", sonrasında "Welcome!" yazısını ekrana basar */}
+      <Text style={styles.message}>{message}</Text>
+    </View>
+  );
+}
+
+// ==========================================
+// 5. TASARIM VE STİL TANIMLAMALARI (StyleSheet)
+// ==========================================
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,                    // Ekranın tamamını kapla
+    justifyContent: 'center',   // Dikeyde tam ortala
+    alignItems: 'center',       // Yatayda tam ortala
+  },
+  message: {
+    fontSize: 20,               // Yazı boyutu
+    fontWeight: 'bold',         // Kalın yazı tipi
+    color: '#007AFF',           // Mavi yazı rengi
+  },
+});
