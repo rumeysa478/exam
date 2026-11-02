@@ -1,0 +1,58 @@
+// ==========================================
+// CourseLevelPicker.js - Picker (Seçim Kutusu) Örneği
+// ==========================================
+
+import { useState } from 'react';
+import { SafeAreaView, View, Text } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // Açılır liste bileşeni (Harici paket gerektirir)
+
+// 1. SEÇENEKLER LİSTESİ (DATA)
+// Kullanıcının seçebileceği ders düzeylerini içeren sabit dizi (id ve ekranda görünecek label)
+const COURSE_LEVELS = [
+  { id: 'foundation', label: 'Foundation · Components' },
+  { id: 'growth', label: 'Growth · Navigation' },
+  { id: 'advanced', label: 'Advanced · Performance' },
+];
+
+export default function CourseLevelPicker() {
+  
+  // 2. STATE (DURUM) TANIMLAMASI
+  // level: Kullanıcının o an seçtiği seçeneğin 'id'sini tutar (Başlangıç değeri: 'foundation')
+  const [level, setLevel] = useState('foundation');
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan sağlar (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a', padding: 24 }}>
+      
+      {/* Sabit Bilgilendirme Metni */}
+      <Text style={{ color: '#94a3b8', fontSize: 16 }}>Aktif Ders Bloğu</Text>
+      
+      {/* 3. DİNAMİK BAŞLIK GÖSTERGESİ (.find metodu) */}
+      {/* COURSE_LEVELS dizisinde, seçilen 'level' id'sine sahip öğeyi bulur ve 'label' değerini ekrana büyük yazdırır */}
+      <Text style={{ color: '#e2e8f0', fontSize: 28, fontWeight: '700' }}>
+        {COURSE_LEVELS.find((item) => item.id === level)?.label}
+      </Text>
+
+      {/* 4. PICKER (AÇILIR SEÇİM MENÜSÜ) KAPSAYICISI */}
+      <View style={{ marginTop: 32, backgroundColor: '#1e293b', borderRadius: 12 }}>
+        <Picker
+          selectedValue={level}                   // Seçili olan değer (state'den beslenir)
+          onValueChange={(value) => setLevel(value)} // Kullanıcı yeni bir seçenek seçtiğinde state'i günceller
+          style={{ color: '#e2e8f0' }}             // Picker yazı rengi
+          dropdownIconColor="#38bdf8"             // Açılır menü ok işaretinin rengi (Açık Mavi)
+        >
+          {/* 5. SEÇENEKLERİ DÖNME (MAP & Picker.Item) */}
+          {COURSE_LEVELS.map((item) => (
+            <Picker.Item
+              key={item.id}                       // Her öğe için benzersiz anahtar
+              label={item.label}                  // Kullanıcının göreceği metin
+              value={item.id}                     // Seçildiğinde state'e atanacak değer
+              color="#e2e8f0"                     // Liste elemanlarının yazı rengi
+            />
+          ))}
+        </Picker>
+      </View>
+      
+    </SafeAreaView>
+  );
+}
