@@ -1,0 +1,74 @@
+// ==========================================
+// TextInputExample.js - Metin Girişi ve Anlık Geri Bildirim Örneği
+// ==========================================
+
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
+
+export default function TextInputExample() {
+  
+  // 1. STATE (DURUM) TANIMLAMASI
+  // text: Kullanıcının klavyeden yazdığı metni saklar (Başlangıçta boş bir string '')
+  // setText: Kullanıcı klavyede her harfe bastığında state'i güncelleyen fonksiyondur
+  const [text, setText] = useState('');
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Text Input</Text>
+      
+      {/* 2. METİN GİRİŞ ALANI (TextInput) */}
+      <TextInput
+        style={styles.input}
+        placeholder="Write something..." // Kullanıcı kutu boşken göreceği silik rehber yazı
+        value={text}                    // Input'un içindeki değer her zaman 'text' state'ine bağlıdır (Controlled Component)
+        onChangeText={setText}          // Kullanıcı her harf yazdığında tetiklenir ve yeni metni state'e kaydeder
+      />
+      
+      {/* 3. ANLIK METİN YANSITMA */}
+      {/* Kullanıcının yazdığı metin alt alta anlık olarak ekrana yazdırılır */}
+      <Text style={styles.displayText}>
+        You wrote: {text}
+      </Text>
+      
+      {/* 4. KARAKTER SAYISI HESAPLAMA */}
+      {/* .length metodu ile string'in kaç karakterden oluştuğu anlık olarak gösterilir */}
+      <Text style={styles.countText}>
+        Character count: {text.length}
+      </Text>
+    </View>
+  );
+}
+
+// ==========================================
+// 5. TASARIM VE STİL TANIMLAMALARI (StyleSheet)
+// ==========================================
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,                    // Ekranın tamamını kapla
+    padding: 20,                // Kenarlardan boşluk bırak
+    justifyContent: 'center',   // Dikeyde tam ortala
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,             // Çerçeve kalınlığı
+    borderColor: '#ccc',        // Çerçeve rengi (Gri)
+    borderRadius: 8,            // Köşeleri yuvarla
+    padding: 12,                // Kutunun iç boşluğu
+    fontSize: 16,               // Yazı boyutu
+    marginBottom: 20,           // Alttan boşluk
+  },
+  displayText: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#333',
+  },
+  countText: {
+    fontSize: 14,
+    color: '#666',
+  },
+});
