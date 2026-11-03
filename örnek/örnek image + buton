@@ -1,0 +1,158 @@
+// ==========================================
+// ExamImageScreen.js - Resim ve Etkileşimli Sınav Ekranı
+// ==========================================
+
+import { useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
+// Sabit Görsel Linki
+const COURSE_IMAGE_URI = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c';
+
+export default function ExamImageScreen() {
+  
+  // 1. STATE (DURUM) TANIMLAMALARI
+  const [loading, setLoading] = useState(true);   // Görsel yükleniyor mu? (true/false)
+  const [error, setError] = useState(false);      // Görsel yüklenirken hata oluştu mu? (true/false)
+  const [likes, setLikes] = useState(128);        // Beğeni sayısı sayaç state'i
+  const [isLiked, setIsLiked] = useState(false);  // Kullanıcı beğendi mi?
+
+  return (
+    // SafeAreaView: Çentikli ekranlar için güvenli alan (#0f172a koyu lacivert arkaplan)
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
+      
+      {/* ScrollView: İçeriğin dikeyde kaydırılabilmesini sağlar */}
+      <ScrollView contentContainerStyle={{ padding: 24, gap: 20 }}>
+        
+        {/* ÜST BAŞLIK */}
+        <View style={{ gap: 4 }}>
+          <Text style={{ color: '#38bdf8', fontSize: 14, fontWeight: '600' }}>
+            FEATURED LESSON
+          </Text>
+          <Text style={{ color: '#f8fafc', fontSize: 26, fontWeight: '700' }}>
+            React Native UI Masterclass
+          </Text>
+        </View>
+
+        {/* 2. RESİM KARTI KONTEYNERİ */}
+        <View
+          style={{
+            height: 220,
+            borderRadius: 20,
+            backgroundColor: '#1f2937',
+            overflow: 'hidden', // ÖNEMLİ: Resmin köşelerinin kutunun dışına taşmasını engeller!
+          }}
+        >
+          {/* A) Yükleniyor Göstergesi (Loading Indicator) */}
+          {loading && !error && (
+            <View
+              style={{
+                ...StyleSheet.absoluteFillObject, // Kutuyu tamamen kaplar
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#1e293b',
+              }}
+            >
+              <ActivityIndicator size="large" color="#38bdf8" />
+            </View>
+          )}
+
+          {/* B) Hata Durumu (Error State) */}
+          {error && (
+            <View
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#1e293b',
+              }}
+            >
+              <Ionicons name="alert-circle-outline" size={32} color="#ef4444" />
+              <Text style={{ color: '#f8fafc', marginTop: 8 }}>Image failed to load</Text>
+            </View>
+          )}
+
+          {/* C) IMAGE (RESİM) BİLEŞENİ VE YAŞAM DÖNGÜSÜ */}
+          <Image
+            source={{ uri: COURSE_IMAGE_URI }}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover" // Resmi orantılı şekilde kutuya oturtur
+            
+            // Yaşam Döngüsü Olayları (Lifecycle Hooks)
+            onLoadStart={() => {
+              setLoading(true);
+              setError(false);
+            }}
+            onLoad={() => setLoading(false)} // Yükleme bittiğinde çarkı kapat
+            onError={() => {
+              setLoading(false);
+              setError(true); // Hata durumunu tetikle
+            }}
+          />
+        </View>
+
+        {/* 3. AÇIKLAMA METNİ */}
+        <View style={{ gap: 8 }}>
+          <Text style={{ color: '#cbd5f5', lineHeight: 22, fontSize: 15 }}>
+            Learn how to handle remote images, loading states, error boundaries, and custom image components efficiently in Expo.
+          </Text>
+        </View>
+
+        {/* 4. ETKİLEŞİM ALANI (Beğeni Butonu ve Sayaç) */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
+          
+          {/* Beğeni Butonu (TouchableOpacity) */}
+          <TouchableOpacity
+            onPress={() => {
+              setIsLiked((prev) => !prev);
+              setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
+            }}
+            activeOpacity={0.7}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              borderRadius: 999, // Hap (pill) buton tasarımı
+              backgroundColor: isLiked ? '#ef4444' : '#1e293b',
+            }}
+          >
+            <Ionicons
+              name={isLiked ? 'heart' : 'heart-outline'}
+              size={20}
+              color="#fff"
+            />
+            <Text style={{ color: '#fff', fontWeight: '600' }}>
+              {isLiked ? 'Liked' : 'Like'} ({likes})
+            </Text>
+          </TouchableOpacity>
+
+          {/* Aksiyon Butonu */}
+          <TouchableOpacity
+            onPress={() => alert('Course started!')}
+            style={{
+              paddingVertical: 12,
+              paddingHorizontal: 24,
+              borderRadius: 12,
+              backgroundColor: '#2563eb',
+            }}
+          >
+            <Text style={{ color: '#fff', fontWeight: '700' }}>Start Lesson</Text>
+          </TouchableOpacity>
+          
+        </View>
+
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
